@@ -1,0 +1,124 @@
+name: Pull Request verification
+
+on:
+  pull_request:
+    branches: [ "main", "release/*" ]
+
+
+jobs:
+  build:
+    name: Build and test package
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+
+      matrix:
+        os: [ubuntu-latest]
+        build_type: [Release, Debug]
+        cpp_compiler: [g++, clang++]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install ninja
+      shell: bash
+      run: sudo apt-get install ninja-build
+
+    - uses: actions/checkout@v4
+      with:
+        repository: ricardobtez/conan_profiles
+        path: conan_profiles
+        token: ${{ secrets.GH_TOKEN }}
+
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/cmake-build-${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
+        if [ ${{ matrix.cpp_compiler }} == "clang++" ]; then
+          echo "profile=linux_x86_64-clang" >> "$GITHUB_OUTPUT"
+        else
+          echo "profile=linux_x86_64-gcc" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Get conan
+      uses: turtlebrowser/get-conan@main
+      with:
+        version: 2.0.14
+
+    - name: Configure conan profiles
+      shell: bash
+      run: conan config install -t dir ${{ github.workspace }}/conan_profiles
+
+    - name: Add own conan server
+      shell: bash
+      run: conan remote add --index 0 conan_remote http://${{ secrets.CONAN_SERVER_ADDRESS }}:9300
+
+    - name: Login into own conan server
+      shell: bash
+      run: conan remote login -p ${{ secrets.CONAN_CONFIG_PASSWORD }} conan_remote ghuser
+
+    - name: Get conan dependencies
+      id: conan-install
+      shell: bash
+      run: |
+        conan install . --output-folder=${{ steps.strings.outputs.build-output-dir }} --build=missing \
+            -pr:a ${{ steps.strings.outputs.profile }} -s:a build_type=${{ matrix.build_type }}
+
+    - name: Configure CMake
+      run: |
+        source ${{ steps.strings.outputs.build-output-dir }}/conanbuild.sh
+        cmake -B ${{ steps.strings.outputs.build-output-dir }} -DCMAKE_TOOLCHAIN_FILE=${{ steps.strings.outputs.build-output-dir }}/conan_toolchain.cmake \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        source ${{ steps.strings.outputs.build-output-dir }}/deactivate_conanbuild.sh
+
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - name: Test
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+
+
+  clang-format-check:
+    name: clang-format check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: clang-format check 'src'
+        uses: jidicula/clang-format-action@v4.11.0
+        with:
+          clang-format-version: '15'
+          check-path: 'src'
+
+      - name: clang-format check 'include'
+        uses: jidicula/clang-format-action@v4.11.0
+        with:
+          clang-format-version: '15'
+          check-path: 'include'
+
+      - name: clang-format check 'test'
+        uses: jidicula/clang-format-action@v4.11.0
+        with:
+          clang-format-version: '15'
+          check-path: 'test'
+
+      - name: clang-format check 'samples'
+        uses: jidicula/clang-format-action@v4.11.0
+        with:
+          clang-format-version: '15'
+          check-path: 'samples'
+
+
+  conventional-commits-check:
+    name: Conventional commits check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check for Conventional Commit compliance
+        uses: tomtom-international/commisery-action@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
