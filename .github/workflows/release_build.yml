@@ -1,0 +1,115 @@
+name: Build and Publish package workflow
+
+on:
+  workflow_call:
+    inputs:
+      package-version:
+        description: The package version to release
+        required: true
+        type: string
+      publish:
+        description: Publish the package
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    name: Builds the package
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        build_type: [Release, Debug]
+        cpp_compiler: [g++, clang++]
+        enable_coverage: [false, true]
+        exclude:
+          - os: ubuntu-latest
+            cpp_compiler: clang++
+            enable_coverage: true
+          - os: ubuntu-latest
+            build_type: Release
+            enable_coverage: true
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: Install needed tools
+      shell: bash
+      run: sudo apt-get install ninja-build gcovr
+
+    - uses: actions/checkout@v4
+      with:
+        repository: ricardobtez/conan_profiles
+        path: conan_profiles
+        token: ${{ secrets.GH_TOKEN }}
+
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/cmake-build-${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
+        if [ ${{ matrix.cpp_compiler }} == "clang++" ]; then
+          echo "profile=linux_x86_64-clang" >> "$GITHUB_OUTPUT"
+        else
+          echo "profile=linux_x86_64-gcc" >> "$GITHUB_OUTPUT"
+        fi
+        if [ ${{ matrix.enable_coverage }} == true ]; then
+          echo "enable-coverage-string=True" >> "$GITHUB_OUTPUT"
+        else
+          echo "enable-coverage-string=False" >> "$GITHUB_OUTPUT"
+        fi
+        echo Building version "${{ inputs.package_version }}"
+
+    - name: Get conan
+      uses: turtlebrowser/get-conan@main
+      with:
+        version: 2.0.14
+
+    - name: Configure conan profiles
+      shell: bash
+      run: conan config install -t dir ${{ github.workspace }}/conan_profiles
+
+    - name: Add own conan server
+      shell: bash
+      run: conan remote add --index 0 build2l_remote http://${{ secrets.CONAN_SERVER_ADDRESS }}:9300
+
+    - name: Login into own conan server
+      shell: bash
+      run: conan remote login -p ${{ secrets.CONAN_CONFIG_PASSWORD }} build2l_remote ghuser
+
+    - name: Create package
+      shell: bash
+      run: |
+        conan create --version "${{ inputs.package-version }}" . --build-require \
+            --build=missing -pr:a ${{ steps.strings.outputs.profile }} -s:a build_type=${{ matrix.build_type }} \
+            -o:a *:build2l_coverage=${{ steps.strings.outputs.enable-coverage-string }}
+
+    - name: Get coverage file
+      if: ${{ matrix.enable_coverage }} == true
+      shell: bash
+      run: |
+        find ~/.conan2/p/b -type d -iname "build[A-Za-z0-9]*" | head -n 1 > build_folder.txt
+        export BUILD_FOLDER=$(cat build_folder.txt)
+        gcovr -r $BUILD_FOLDER/b --xml coverage_report.xml --xml-pretty  -v $BUILD_FOLDER/b/src
+
+    - name: Publish package
+      if: ${{ inputs.publish }} == true
+      shell: bash
+      run: |
+        conan upload -r build2l_remote build2l/${{ inputs.package-version }}
+
+    - name: Publish coverage results
+      if: ${{ matrix.enable_coverage }} == true
+      uses: codecov/codecov-action@v4
+      with:
+        fail_ci_if_error: true
+        name: build2l-coverage
+        file: coverage_report.xml
+        disable_search: true
+        flags: unittest
+        token: ${{ secrets.CODECOV_TOKEN }}
+        verbose: true
