@@ -1,5 +1,5 @@
 #include <cppgit2/data_buffer.hpp>
-#include <doctest.hpp>
+#include "doctest.hpp"
 using doctest::test_suite;
 using namespace cppgit2;
 
