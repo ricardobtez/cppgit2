@@ -4,7 +4,7 @@ namespace cppgit2 {
 
 commit::commit() : c_ptr_(nullptr), owner_(ownership::libgit2) {}
 
-commit::commit(git_commit *c_ptr, ownership owner)
+commit::commit(git_commit* c_ptr, ownership owner)
     : c_ptr_(c_ptr), owner_(owner) {}
 
 commit::~commit() {
@@ -12,11 +12,11 @@ commit::~commit() {
     git_commit_free(c_ptr_);
 }
 
-void commit::amend(const oid &id, const std::string &update_ref,
-                   const signature &author, const signature &committer,
-                   const std::string &message_encoding,
-                   const std::string &message, const cppgit2::tree &tree) {
-  if (git_commit_amend(const_cast<git_oid *>(id.c_ptr()), c_ptr_,
+void commit::amend(const oid& id, const std::string& update_ref,
+                   const signature& author, const signature& committer,
+                   const std::string& message_encoding,
+                   const std::string& message, const cppgit2::tree& tree) {
+  if (git_commit_amend(const_cast<git_oid*>(id.c_ptr()), c_ptr_,
                        update_ref.c_str(), author.c_ptr(), committer.c_ptr(),
                        message_encoding.c_str(), message.c_str(), tree.c_ptr()))
     throw git_exception();
@@ -47,14 +47,16 @@ commit commit::copy() const {
   return result;
 }
 
-std::string commit::operator[](const std::string &field) const {
+std::string commit::operator[](const std::string& field) const {
   data_buffer result(nullptr);
   if (git_commit_header_field(result.c_ptr(), c_ptr_, field.c_str()))
     throw git_exception();
   return result.to_string();
 }
 
-oid commit::id() const { return oid(git_commit_id(c_ptr_)); }
+oid commit::id() const {
+  return oid(git_commit_id(c_ptr_));
+}
 
 std::string commit::message() const {
   auto ret = git_commit_message(c_ptr_);
@@ -118,7 +120,9 @@ std::string commit::summary() const {
     return "";
 }
 
-epoch_time_seconds commit::time() const { return git_commit_time(c_ptr_); }
+epoch_time_seconds commit::time() const {
+  return git_commit_time(c_ptr_);
+}
 
 offset_minutes commit::time_offset() const {
   return git_commit_time_offset(c_ptr_);
@@ -131,12 +135,16 @@ tree commit::tree() const {
   return result;
 }
 
-oid commit::tree_id() const { return oid(git_commit_tree_id(c_ptr_)); }
+oid commit::tree_id() const {
+  return oid(git_commit_tree_id(c_ptr_));
+}
 
 repository commit::owner() const {
   return repository(git_commit_owner(c_ptr_));
 }
 
-const git_commit *commit::c_ptr() const { return c_ptr_; }
+const git_commit* commit::c_ptr() const {
+  return c_ptr_;
+}
 
-} // namespace cppgit2
+}  // namespace cppgit2

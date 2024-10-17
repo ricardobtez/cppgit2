@@ -5,7 +5,7 @@ namespace cppgit2 {
 
 object::object() : c_ptr_(nullptr), owner_(ownership::user) {}
 
-object::object(git_object *c_ptr, ownership owner)
+object::object(git_object* c_ptr, ownership owner)
     : c_ptr_(c_ptr), owner_(owner) {}
 
 object::~object() {
@@ -13,7 +13,9 @@ object::~object() {
     git_object_free(c_ptr_);
 }
 
-oid object::id() const { return oid(git_object_id(c_ptr_)->id); }
+oid object::id() const {
+  return oid(git_object_id(c_ptr_)->id);
+}
 
 std::string object::short_id() const {
   git_buf result;
@@ -50,7 +52,7 @@ std::string object::type_string() const {
   return object::string_from_type(this->type());
 }
 
-object::object_type object::type_from_string(const std::string &type_string) {
+object::object_type object::type_from_string(const std::string& type_string) {
   return static_cast<object_type>(git_object_string2type(type_string.c_str()));
 }
 
@@ -68,30 +70,30 @@ repository object::owner() const {
 
 blob object::as_blob() {
   if (type() == object::object_type::blob)
-    return blob((git_blob *)c_ptr_);
+    return blob((git_blob*)c_ptr_);
   else
     throw git_exception("object is not a blob");
 }
 
 commit object::as_commit() {
   if (type() == object::object_type::commit)
-    return commit((git_commit *)c_ptr_);
+    return commit((git_commit*)c_ptr_);
   else
     throw git_exception("object is not a commit");
 }
 
 tree object::as_tree() {
   if (type() == object::object_type::tree)
-    return tree((git_tree *)c_ptr_);
+    return tree((git_tree*)c_ptr_);
   else
     throw git_exception("object is not a tree");
 }
 
 tag object::as_tag() {
   if (type() == object::object_type::tag)
-    return tag((git_tag *)c_ptr_);
+    return tag((git_tag*)c_ptr_);
   else
     throw git_exception("object is not a tag");
 }
 
-} // namespace cppgit2
+}  // namespace cppgit2

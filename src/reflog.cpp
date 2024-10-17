@@ -4,7 +4,7 @@ namespace cppgit2 {
 
 reflog::reflog() : c_ptr_(nullptr), owner_(ownership::libgit2) {}
 
-reflog::reflog(git_reflog *c_ptr, ownership owner)
+reflog::reflog(git_reflog* c_ptr, ownership owner)
     : c_ptr_(c_ptr), owner_(owner) {}
 
 reflog::~reflog() {
@@ -17,8 +17,8 @@ void reflog::remove(size_t index, bool rewrite_previous_entry) {
     throw git_exception();
 }
 
-void reflog::append(const oid &id, const signature &committer,
-                    const std::string &message) {
+void reflog::append(const oid& id, const signature& committer,
+                    const std::string& message) {
   if (git_reflog_append(c_ptr_, id.c_ptr(), committer.c_ptr(), message.c_str()))
     throw git_exception();
 }
@@ -32,8 +32,12 @@ void reflog::write_to_disk() {
     throw git_exception();
 }
 
-size_t reflog::size() const { return git_reflog_entrycount(c_ptr_); }
+size_t reflog::size() const {
+  return git_reflog_entrycount(c_ptr_);
+}
 
-const git_reflog *reflog::c_ptr() const { return c_ptr_; }
+const git_reflog* reflog::c_ptr() const {
+  return c_ptr_;
+}
 
-} // namespace cppgit2
+}  // namespace cppgit2

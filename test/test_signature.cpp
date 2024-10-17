@@ -58,8 +58,8 @@ TEST_CASE("Interoperatbility with libgit2" * test_suite("signature")) {
 
   // Construct libgit2 signature
   git_signature sig;
-  sig.name = (char *)"Foo Bar";
-  sig.email = (char *)"foo.bar@baz.com";
+  sig.name = (char*)"Foo Bar";
+  sig.email = (char*)"foo.bar@baz.com";
 
   // Construct cppgit2 wrapper
   cppgit2::signature sig2(&sig);

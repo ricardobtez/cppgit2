@@ -4,12 +4,12 @@ using namespace cppgit2;
 
 patch::patch() : c_ptr_(nullptr), owner_(ownership::libgit2) {}
 
-patch::patch(git_patch *c_ptr, ownership owner)
+patch::patch(git_patch* c_ptr, ownership owner)
     : c_ptr_(c_ptr), owner_(owner) {}
 
-patch::patch(const blob &old_blob, const std::string &old_as_path,
-             const void *buffer, size_t buffer_length,
-             const std::string &buffer_as_path, const diff::options &options) {
+patch::patch(const blob& old_blob, const std::string& old_as_path,
+             const void* buffer, size_t buffer_length,
+             const std::string& buffer_as_path, const diff::options& options) {
   owner_ = ownership::user;
   if (git_patch_from_blob_and_buffer(&c_ptr_, old_blob.c_ptr(),
                                      old_as_path.c_str(), buffer, buffer_length,
@@ -17,9 +17,9 @@ patch::patch(const blob &old_blob, const std::string &old_as_path,
     throw git_exception();
 }
 
-patch::patch(const blob &old_blob, const std::string &old_as_path,
-             const blob &new_blob, const std::string &new_as_path,
-             const diff::options &options) {
+patch::patch(const blob& old_blob, const std::string& old_as_path,
+             const blob& new_blob, const std::string& new_as_path,
+             const diff::options& options) {
   owner_ = ownership::user;
   if (git_patch_from_blobs(&c_ptr_, old_blob.c_ptr(), old_as_path.c_str(),
                            new_blob.c_ptr(), new_as_path.c_str(),
@@ -27,10 +27,10 @@ patch::patch(const blob &old_blob, const std::string &old_as_path,
     throw git_exception();
 }
 
-patch::patch(const void *old_buffer, size_t old_buffer_length,
-             const std::string &old_as_path, const void *new_buffer,
-             size_t new_buffer_length, const std::string &new_as_path,
-             const diff::options &options) {
+patch::patch(const void* old_buffer, size_t old_buffer_length,
+             const std::string& old_as_path, const void* new_buffer,
+             size_t new_buffer_length, const std::string& new_as_path,
+             const diff::options& options) {
   owner_ = ownership::user;
   if (git_patch_from_buffers(&c_ptr_, old_buffer, old_buffer_length,
                              old_as_path.c_str(), new_buffer, new_buffer_length,
@@ -38,7 +38,7 @@ patch::patch(const void *old_buffer, size_t old_buffer_length,
     throw git_exception();
 }
 
-patch::patch(const diff &diff, size_t index) {
+patch::patch(const diff& diff, size_t index) {
   owner_ = ownership::user;
   if (git_patch_from_diff(&c_ptr_, diff.c_ptr_, index))
     throw git_exception();
@@ -79,37 +79,39 @@ std::tuple<size_t, size_t, size_t> patch::line_stats() const {
                                             deletion_lines};
 }
 
-size_t patch::num_hunks() const { return git_patch_num_hunks(c_ptr_); }
+size_t patch::num_hunks() const {
+  return git_patch_num_hunks(c_ptr_);
+}
 
 size_t patch::num_lines_in_hunk(size_t hunk_index) const {
   return git_patch_num_lines_in_hunk(c_ptr_, hunk_index);
 }
 
-void patch::print(std::function<void(const diff::delta &, const diff::hunk &,
-                                     const diff::line &)>
+void patch::print(std::function<void(const diff::delta&, const diff::hunk&,
+                                     const diff::line&)>
                       line_callback) {
 
   // Prepare wrapper to pass to C API
   struct visitor_wrapper {
-    std::function<void(const diff::delta &, const diff::hunk &,
-                       const diff::line &)>
+    std::function<void(const diff::delta&, const diff::hunk&,
+                       const diff::line&)>
         line_callback;
   };
 
   visitor_wrapper wrapper;
   wrapper.line_callback = line_callback;
 
-  auto line_callback_c = [](const git_diff_delta *delta_c,
-                            const git_diff_hunk *hunk_c,
-                            const git_diff_line *line_c, void *payload) {
-    auto wrapper = reinterpret_cast<visitor_wrapper *>(payload);
+  auto line_callback_c = [](const git_diff_delta* delta_c,
+                            const git_diff_hunk* hunk_c,
+                            const git_diff_line* line_c, void* payload) {
+    auto wrapper = reinterpret_cast<visitor_wrapper*>(payload);
     if (wrapper->line_callback)
       wrapper->line_callback(diff::delta(delta_c), diff::hunk(hunk_c),
                              diff::line(line_c));
     return 0;
   };
 
-  if (git_patch_print(c_ptr_, line_callback_c, (void *)(&wrapper)))
+  if (git_patch_print(c_ptr_, line_callback_c, (void*)(&wrapper)))
     throw git_exception();
 }
 
@@ -126,4 +128,6 @@ data_buffer patch::to_buffer() {
   return result;
 }
 
-const git_patch *patch::c_ptr() const { return c_ptr_; }
+const git_patch* patch::c_ptr() const {
+  return c_ptr_;
+}
