@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace cppgit2;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   if (argc == 2) {
     // Create new repo
     auto repo = repository::init(argv[1], false);

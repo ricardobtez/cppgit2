@@ -2,12 +2,12 @@
 #include <iostream>
 using namespace cppgit2;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   if (argc == 2) {
     auto repo = repository::open(argv[1]);
 
     repo.for_each_reference(
-        [](const reference &ref) { std::cout << ref.name() << std::endl; });
+        [](const reference& ref) { std::cout << ref.name() << std::endl; });
 
     // Use the following if you just want to iterate over reference names
     // repo.for_each_reference_name(
