@@ -26,9 +26,9 @@ class Cppgit2Conan(ConanFile):
     # Optional metadata
     license = "MIT"
     author = "Ricardo Benitez (benitezc.ricardo@gmail.com)"
-    url = "https://github.com/ricardobtez/build2l.git"
+    url = "https://github.com/ricardobtez/cppgit2.git"
     description = "A `libgit2` wrapper library for use in modern C++"
-    topics = ("build", "c", "cpp", "cmake", "tool")
+    topics = ("git", "c", "cpp", "tool")
 
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
