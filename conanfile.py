@@ -36,7 +36,7 @@ class Cppgit2Conan(ConanFile):
     default_options = {"shared": False}
 
     # Sources are located in the same place as this recipe, copy them to the recipe
-    exports_sources = "CMakeLists.txt", "src/*", "include/*", "test/*", "samples/*"
+    exports_sources = "CMakeLists.txt", "src/*", "include/*", "test/*", "samples/*", "LICENSE"
     generators = "CMakeDeps"
 
     def requirements(self):
@@ -48,6 +48,7 @@ class Cppgit2Conan(ConanFile):
     def _configure_cmake(self):
         cmake = CMake(self)
         cmake_variables = {}
+        cmake.configure()
         return cmake
 
     def generate(self):
@@ -64,4 +65,11 @@ class Cppgit2Conan(ConanFile):
             )
 
     def package(self):
-        pass
+        cmake = self._configure_cmake()
+        cmake.install()
+        copy(self, "LICENSE", join(self.source_folder), join(self.package_folder, "licenses"))
+
+    def package_info(self):
+        self.cpp_info.libs = ["cppgit2"]
+        self.cpp.info.libdirs = ["lib"]
+        self.cpp_info.includedirs = ["include"]
