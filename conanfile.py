@@ -48,6 +48,7 @@ class Cppgit2Conan(ConanFile):
     def _configure_cmake(self):
         cmake = CMake(self)
         cmake_variables = {}
+        cmake.configure()
         return cmake
 
     def generate(self):
@@ -64,4 +65,5 @@ class Cppgit2Conan(ConanFile):
             )
 
     def package(self):
-        pass
+        cmake = self._configure_cmake()
+        cmake.install()
