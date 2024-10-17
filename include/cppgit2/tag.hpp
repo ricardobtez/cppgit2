@@ -1,21 +1,21 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/object.hpp>
 #include <cppgit2/oid.hpp>
 #include <cppgit2/ownership.hpp>
 #include <cppgit2/signature.hpp>
-#include <git2.h>
 
 namespace cppgit2 {
 
 class tag : public libgit2_api {
-public:
+ public:
   // Default construct a tag
   tag();
 
   // Construct from libgit2 C ptr
   // If owned by user, this will be free'd in destructor
-  tag(git_tag *c_ptr, ownership owner = ownership::libgit2);
+  tag(git_tag* c_ptr, ownership owner = ownership::libgit2);
 
   // Cleanup tag ptr
   ~tag();
@@ -51,13 +51,13 @@ public:
   class repository owner() const;
 
   // Access to libgit2 C ptr
-  git_tag *c_ptr();
-  const git_tag *c_ptr() const;
+  git_tag* c_ptr();
+  const git_tag* c_ptr() const;
 
-private:
+ private:
   friend class repository;
-  git_tag *c_ptr_;
+  git_tag* c_ptr_;
   ownership owner_;
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

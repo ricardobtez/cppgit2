@@ -12,4 +12,4 @@ enum class file_mode {
   commit = 0160000
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

@@ -1,4 +1,5 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/checkout.hpp>
 #include <cppgit2/index.hpp>
 #include <cppgit2/libgit2_api.hpp>
@@ -6,18 +7,17 @@
 #include <cppgit2/oid.hpp>
 #include <cppgit2/ownership.hpp>
 #include <cppgit2/signature.hpp>
-#include <git2.h>
 #include <string>
 
 namespace cppgit2 {
 
 class rebase : public libgit2_api {
-public:
+ public:
   // Default construct a rebase object
   rebase();
 
   // Construct from libgit2 C ptr
-  rebase(git_rebase *c_ptr, ownership owner = ownership::libgit2);
+  rebase(git_rebase* c_ptr, ownership owner = ownership::libgit2);
 
   // Free rebase object if owned by user
   ~rebase();
@@ -26,10 +26,10 @@ public:
   // Describes a single instruction/operation to be performed during the
   // rebase.
   class operation : libgit2_api {
-  public:
+   public:
     operation() : c_ptr_(nullptr) {}
 
-    operation(git_rebase_operation *c_ptr) : c_ptr_(c_ptr) {}
+    operation(git_rebase_operation* c_ptr) : c_ptr_(c_ptr) {}
 
     // Type of rebase operation in-progress after calling `git_rebase_next`.
     enum class operation_type {
@@ -69,9 +69,9 @@ public:
       return ret ? std::string(ret) : "";
     }
 
-  private:
+   private:
     friend class rebase;
-    git_rebase_operation *c_ptr_;
+    git_rebase_operation* c_ptr_;
   };
 
   // Aborts a rebase that is currently in progress, resetting the
@@ -81,12 +81,12 @@ public:
   // Commits the current patch. You must have resolved any conflicts that
   // were introduced during the patch application from the
   // `git_rebase_next` invocation.
-  oid commit(const signature &author, const signature &committer,
-             const std::string &message_encoding, const std::string &message);
+  oid commit(const signature& author, const signature& committer,
+             const std::string& message_encoding, const std::string& message);
 
   // Finishes a rebase that is currently in progress once all patches
   // have been applied.
-  void finish(const signature &sig);
+  void finish(const signature& sig);
 
   // Gets the index produced by the last operation, which is the result of
   // git_rebase_next and which will be committed by the next invocation of
@@ -126,7 +126,7 @@ public:
   std::string original_head_name();
 
   class options : public libgit2_api {
-  public:
+   public:
     options() {
       auto ret = git_rebase_init_options(&default_options_,
                                          GIT_REBASE_OPTIONS_VERSION);
@@ -135,7 +135,7 @@ public:
         throw git_exception();
     }
 
-    options(git_rebase_options *c_ptr) : c_ptr_(c_ptr) {}
+    options(git_rebase_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -165,7 +165,7 @@ public:
       return c_ptr_->rewrite_notes_ref ? std::string(c_ptr_->rewrite_notes_ref)
                                        : "";
     }
-    void set_rewrite_notes_ref(const std::string &value) {
+    void set_rewrite_notes_ref(const std::string& value) {
       c_ptr_->rewrite_notes_ref = value.c_str();
     }
 
@@ -173,7 +173,7 @@ public:
     merge::options merge_options() const {
       return merge::options(&c_ptr_->merge_options);
     }
-    void set_merge_options(const merge::options &options) {
+    void set_merge_options(const merge::options& options) {
       c_ptr_->merge_options = *(options.c_ptr());
     }
 
@@ -185,22 +185,22 @@ public:
     checkout::options checkout_options() const {
       return checkout::options(&c_ptr_->checkout_options);
     }
-    void set_checkout_options(const checkout::options &options) {
+    void set_checkout_options(const checkout::options& options) {
       c_ptr_->checkout_options = *(options.c_ptr());
     }
 
-    const git_rebase_options *c_ptr() const { return c_ptr_; }
+    const git_rebase_options* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     friend rebase;
-    git_rebase_options *c_ptr_;
+    git_rebase_options* c_ptr_;
     git_rebase_options default_options_;
   };
 
-private:
+ private:
   friend class repository;
   ownership owner_;
-  git_rebase *c_ptr_;
+  git_rebase* c_ptr_;
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

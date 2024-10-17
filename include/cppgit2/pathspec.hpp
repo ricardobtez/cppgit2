@@ -1,21 +1,21 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/bitmask_operators.hpp>
 #include <cppgit2/diff.hpp>
 #include <cppgit2/index.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/ownership.hpp>
-#include <git2.h>
 #include <vector>
 
 namespace cppgit2 {
 
 class pathspec : public libgit2_api {
-public:
+ public:
   // Default construct a pathspec object
   pathspec();
 
   // Construct from libgit2 C ptr
-  pathspec(git_pathspec *c_ptr, ownership owner);
+  pathspec(git_pathspec* c_ptr, ownership owner);
 
   // Cleanup pathspec if needed
   ~pathspec();
@@ -31,9 +31,9 @@ public:
   };
 
   class match_list {
-  public:
+   public:
     match_list() : c_ptr_(nullptr), owner_(ownership::libgit2) {}
-    match_list(git_pathspec_match_list *c_ptr,
+    match_list(git_pathspec_match_list* c_ptr,
                ownership owner = ownership::libgit2)
         : c_ptr_(c_ptr), owner_(owner) {}
 
@@ -72,39 +72,39 @@ public:
     }
 
     // Acecss libgit2 C ptr
-    const git_pathspec_match_list *c_ptr() const { return c_ptr_; }
+    const git_pathspec_match_list* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     ownership owner_;
-    git_pathspec_match_list *c_ptr_;
+    git_pathspec_match_list* c_ptr_;
   };
 
   // Compile a pathspec
-  static pathspec compile(const strarray &paths);
+  static pathspec compile(const strarray& paths);
 
   // Match a pathspec against files in a diff list.
-  match_list match_diff(const diff &diff, flag flags);
+  match_list match_diff(const diff& diff, flag flags);
 
   // Match a pathspec against entries in an index.
-  match_list match_index(const index &index, flag flags);
+  match_list match_index(const index& index, flag flags);
 
   // Match a pathspec against files in a tree.
-  match_list match_tree(const tree &tree, flag flags);
+  match_list match_tree(const tree& tree, flag flags);
 
   // Match a pathspec against the working directory of a repository.
-  match_list match_workdir(const class repository &repo, flag flags);
+  match_list match_workdir(const class repository& repo, flag flags);
 
   // Try to match a path against a pathspec
   // Returns true if path matches spec, false if it does not
-  bool matches_path(flag flags, const std::string &path) const;
+  bool matches_path(flag flags, const std::string& path) const;
 
   // Access libgit2 C ptr
-  const git_pathspec *c_ptr() const;
+  const git_pathspec* c_ptr() const;
 
-private:
+ private:
   ownership owner_;
-  git_pathspec *c_ptr_;
+  git_pathspec* c_ptr_;
 };
 ENABLE_BITMASK_OPERATORS(pathspec::flag);
 
-} // namespace cppgit2
+}  // namespace cppgit2

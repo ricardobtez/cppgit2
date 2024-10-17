@@ -1,4 +1,5 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/bitmask_operators.hpp>
 #include <cppgit2/blob.hpp>
 #include <cppgit2/data_buffer.hpp>
@@ -8,7 +9,6 @@
 #include <cppgit2/signature.hpp>
 #include <cppgit2/strarray.hpp>
 #include <functional>
-#include <git2.h>
 #include <string>
 #include <utility>
 #include <vector>
@@ -16,12 +16,12 @@
 namespace cppgit2 {
 
 class diff : public libgit2_api {
-public:
+ public:
   // Default construct a diff object
   diff();
 
   // Construct from libgit2 C ptr
-  diff(git_diff *c_ptr, ownership owner = ownership::libgit2);
+  diff(git_diff* c_ptr, ownership owner = ownership::libgit2);
 
   // Read the contents of a git patch file into a git_diff object.
   // The diff object produced is similar to the one that would be produced if
@@ -29,16 +29,16 @@ public:
   // there may be subtle differences. For example, a patch file likely contains
   // abbreviated object IDs, so the object IDs in a git_diff_delta produced by
   // this function will also be abbreviated.
-  diff(const std::string &buffer);
+  diff(const std::string& buffer);
 
   // Cleanup diff
   // Free if owned by user
   ~diff();
 
   class delta : public libgit2_api {
-  public:
+   public:
     delta() {}
-    delta(const git_diff_delta *c_ptr) {
+    delta(const git_diff_delta* c_ptr) {
       if (c_ptr)
         c_struct_ = *c_ptr;
     }
@@ -46,29 +46,29 @@ public:
 
     // Flags for the delta object and the file objects on each side.
     enum class flag {
-      binary = (1u << 0),     // file(s) treated as binary data
-      not_binary = (1u << 1), // file(s) treated as text data
-      valid_id = (1u << 2),   // `id` value is known correct
-      exists = (1u << 3),     // file exists at this side of the delta
+      binary = (1u << 0),      // file(s) treated as binary data
+      not_binary = (1u << 1),  // file(s) treated as text data
+      valid_id = (1u << 2),    // `id` value is known correct
+      exists = (1u << 3),      // file exists at this side of the delta
     };
 
     // What type of change is described by this delta?
     enum class type {
-      unmodified = 0, // no change
-      added = 1,      // entry does not exist in old version
-      deleted = 2,    // entry does not exist in new version
-      modified = 3,   // entry content changed between old and new
-      renamed = 4,    // entry was renamed between old and new
-      copied = 5,     // entry was copied from another old entry
-      ignored = 6,    // entry is ignored item in workdir
-      untracked = 7,  // entry is untracked item in workdir
-      typechange = 8, // type of entry changed between old and new
-      unreadable = 9, // entry is unreadable
-      conflicted = 10 // entry in the index is conflicted
+      unmodified = 0,  // no change
+      added = 1,       // entry does not exist in old version
+      deleted = 2,     // entry does not exist in new version
+      modified = 3,    // entry content changed between old and new
+      renamed = 4,     // entry was renamed between old and new
+      copied = 5,      // entry was copied from another old entry
+      ignored = 6,     // entry is ignored item in workdir
+      untracked = 7,   // entry is untracked item in workdir
+      typechange = 8,  // type of entry changed between old and new
+      unreadable = 9,  // entry is unreadable
+      conflicted = 10  // entry in the index is conflicted
     };
 
     class file : public libgit2_api {
-    public:
+     public:
       // The `id` is the `git_oid` of the item.
       oid id() const { return oid(c_struct_.id.id); }
 
@@ -96,7 +96,7 @@ public:
       // abbreviated to something reasonable, like 7 characters.
       uint16_t abbreviated_id() const { return c_struct_.id_abbrev; }
 
-    private:
+     private:
       friend diff;
       git_diff_file c_struct_;
     };
@@ -121,13 +121,13 @@ public:
       return result;
     }
 
-  private:
+   private:
     friend diff;
     git_diff_delta c_struct_;
   };
 
   class options : public libgit2_api {
-  public:
+   public:
     options() {
       auto ret =
           git_diff_init_options(&default_options_, GIT_DIFF_OPTIONS_VERSION);
@@ -136,7 +136,7 @@ public:
         throw git_exception();
     }
 
-    options(git_diff_options *c_ptr) : c_ptr_(c_ptr) {}
+    options(git_diff_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Flags for diff options.  A combination of these flags can be passed
     // in via the `flags` value in the `git_diff_options`
@@ -257,7 +257,7 @@ public:
       return strarray(&c_ptr_->pathspec).to_vector();
     }
 
-    void set_pathspec(const std::vector<std::string> &value) {
+    void set_pathspec(const std::vector<std::string>& value) {
       c_ptr_->pathspec = *(strarray(value).c_ptr());
     }
 
@@ -286,7 +286,7 @@ public:
         return "";
     }
 
-    void set_old_prefix(const std::string &value) {
+    void set_old_prefix(const std::string& value) {
       c_ptr_->old_prefix = value.c_str();
     }
 
@@ -297,22 +297,22 @@ public:
         return "";
     }
 
-    void set_new_prefix(const std::string &value) {
+    void set_new_prefix(const std::string& value) {
       c_ptr_->new_prefix = value.c_str();
     }
 
-    const git_diff_options *c_ptr() const { return c_ptr_; }
+    const git_diff_options* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     friend diff;
-    git_diff_options *c_ptr_;
+    git_diff_options* c_ptr_;
     git_diff_options default_options_;
   };
 
   // Directly run a diff on two blobs
   // Each pair is {Blob object, Treat as if it had this filename}
-  static delta compare_files(const std::pair<blob, std::string> &old_file,
-                             const std::pair<blob, std::string> &new_file,
+  static delta compare_files(const std::pair<blob, std::string>& old_file,
+                             const std::pair<blob, std::string>& new_file,
                              diff::options options = diff::options());
 
   // Diff delta for an entry in the diff list
@@ -324,7 +324,7 @@ public:
   // Merge one diff into another
   // This merges items from the `from` list into this list. The resulting diff
   // will have all items that appear in either list.
-  void merge(const diff &from);
+  void merge(const diff& from);
 
   // Query how many diff records are there in a diff
   size_t size() const;
@@ -339,19 +339,19 @@ public:
 
   // Possible output formats for diff
   enum class format {
-    patch = 1u,        // full git diff
-    patch_header = 2u, // just the file headers of patch
-    raw = 3u,          // like git diff --raw
-    name_only = 4u,    // like git diff --name-only
-    name_status = 5u,  // like git diff --name-status
-    patch_id = 6u      // git diff as used by git patch-id
+    patch = 1u,         // full git diff
+    patch_header = 2u,  // just the file headers of patch
+    raw = 3u,           // like git diff --raw
+    name_only = 4u,     // like git diff --name-only
+    name_status = 5u,   // like git diff --name-status
+    patch_id = 6u       // git diff as used by git patch-id
   };
 
   // Produce the complete formatted text output from a diff into a buffer.
   std::string to_string(diff::format format_type) const;
 
   // Access libgit2 C ptr
-  const git_diff *c_ptr() const;
+  const git_diff* c_ptr() const;
 
   // This is an opaque structure which is allocated by `git_diff_get_stats`. You
   // are responsible for releasing the object memory when done, using the
@@ -359,8 +359,8 @@ public:
   //
   // Owned by user
   class stats : public libgit2_api {
-  public:
-    stats(git_diff_stats *c_ptr) : c_ptr_(c_ptr) {}
+   public:
+    stats(git_diff_stats* c_ptr) : c_ptr_(c_ptr) {}
 
     ~stats() {
       if (c_ptr_)
@@ -403,9 +403,9 @@ public:
       return result;
     }
 
-  private:
+   private:
     friend diff;
-    git_diff_stats *c_ptr_;
+    git_diff_stats* c_ptr_;
   };
 
   // Accumulate diff statistics for all patches.
@@ -421,7 +421,7 @@ public:
 
   // Options for controlling the formatting of the generated e-mail.
   class format_email_options : public libgit2_api {
-  public:
+   public:
     format_email_options() : c_ptr_(nullptr) {
       auto ret = git_diff_format_email_init_options(
           &default_options_, GIT_DIFF_FORMAT_EMAIL_OPTIONS_VERSION);
@@ -430,7 +430,7 @@ public:
         throw git_exception();
     }
 
-    format_email_options(git_diff_format_email_options *c_ptr)
+    format_email_options(git_diff_format_email_options* c_ptr)
         : c_ptr_(c_ptr) {}
 
     // Version
@@ -455,13 +455,13 @@ public:
 
     // id to use for the commit
     oid id() const { return oid(c_ptr_->id); }
-    void set_id(const oid &id) { c_ptr_->id = id.c_ptr(); }
+    void set_id(const oid& id) { c_ptr_->id = id.c_ptr(); }
 
     // Summary of the change
     std::string summary() const {
       return c_ptr_->summary ? std::string(c_ptr_->summary) : "";
     }
-    void set_summary(const std::string &value) {
+    void set_summary(const std::string& value) {
       c_ptr_->summary = value.c_str();
     }
 
@@ -469,38 +469,38 @@ public:
     std::string body() const {
       return c_ptr_->body ? std::string(c_ptr_->body) : "";
     }
-    void set_body(const std::string &value) { c_ptr_->body = value.c_str(); }
+    void set_body(const std::string& value) { c_ptr_->body = value.c_str(); }
 
     // Author of the change
     signature author() const { return signature(c_ptr_->author); }
-    void set_author(const signature &sig) { c_ptr_->author = sig.c_ptr(); }
+    void set_author(const signature& sig) { c_ptr_->author = sig.c_ptr(); }
 
     // Access libgit2 C ptr
-    const git_diff_format_email_options *c_ptr() const { return c_ptr_; }
+    const git_diff_format_email_options* c_ptr() const { return c_ptr_; }
 
-  private:
-    git_diff_format_email_options *c_ptr_;
+   private:
+    git_diff_format_email_options* c_ptr_;
     git_diff_format_email_options default_options_;
   };
 
   // Create an e-mail ready patch from a diff.
-  data_buffer
-  format_email(const format_email_options &options = format_email_options());
+  data_buffer format_email(
+      const format_email_options& options = format_email_options());
 
   // When producing a binary diff, the binary data returned will be
   // either the deflated full ("literal") contents of the file, or
   // the deflated binary delta between the two sides (whichever is
   // smaller).
   enum class binary_data_type {
-    none,    // There is no binary delta.
-    literal, // The binary data is the literal contents of the file.
-    delta,   // The binary data is the delta from one side to the other.
+    none,     // There is no binary delta.
+    literal,  // The binary data is the literal contents of the file.
+    delta,    // The binary data is the delta from one side to the other.
   };
 
   // The contents of one of the files in a binary diff.
   class binary_file : public libgit2_api {
-  public:
-    binary_file(const git_diff_binary_file *c_ptr) : c_struct_(*c_ptr) {}
+   public:
+    binary_file(const git_diff_binary_file* c_ptr) : c_struct_(*c_ptr) {}
 
     // The type of binary data for this file
     binary_data_type type() const {
@@ -508,7 +508,7 @@ public:
     }
 
     // The binary data, deflated.
-    const char *data() const { return c_struct_.data; }
+    const char* data() const { return c_struct_.data; }
 
     // The length of the binary data.
     size_t data_length() const { return c_struct_.datalen; }
@@ -517,9 +517,9 @@ public:
     size_t inflated_length() const { return c_struct_.inflatedlen; }
 
     // Access libgit2 C ptr
-    const git_diff_binary_file *c_ptr() const { return &c_struct_; }
+    const git_diff_binary_file* c_ptr() const { return &c_struct_; }
 
-  private:
+   private:
     git_diff_binary_file c_struct_;
   };
 
@@ -531,8 +531,8 @@ public:
   // a base heuristic for binary detection and you can further tune the
   // behavior with git attributes or diff flags and option settings.
   class binary : public libgit2_api {
-  public:
-    binary(const git_diff_binary *c_ptr) : c_struct_(*c_ptr) {}
+   public:
+    binary(const git_diff_binary* c_ptr) : c_struct_(*c_ptr) {}
 
     // Whether there is data in this binary structure or not.
     //
@@ -549,9 +549,9 @@ public:
     binary_file new_file() const { return binary_file(&c_struct_.new_file); }
 
     // Access libgit2 C ptr
-    const git_diff_binary *c_ptr() const { return &c_struct_; }
+    const git_diff_binary* c_ptr() const { return &c_struct_; }
 
-  private:
+   private:
     git_diff_binary c_struct_;
   };
 
@@ -565,8 +565,8 @@ public:
   // NUL-byte terminated, however, because it will be just a span of bytes
   // inside the larger file.
   class line : public libgit2_api {
-  public:
-    line(const git_diff_line *c_ptr) : c_struct_(*c_ptr) {}
+   public:
+    line(const git_diff_line* c_ptr) : c_struct_(*c_ptr) {}
 
     // A git_diff_line_t value
     char origin() const { return c_struct_.origin; }
@@ -587,12 +587,12 @@ public:
     git_off_t content_offset() const { return c_struct_.content_offset; }
 
     // Pointer to diff text, not NUL-byte terminated
-    const char *content() const { return c_struct_.content; }
+    const char* content() const { return c_struct_.content; }
 
     // Access libgit2 C ptr
-    const git_diff_line *c_ptr() const { return &c_struct_; }
+    const git_diff_line* c_ptr() const { return &c_struct_; }
 
-  private:
+   private:
     git_diff_line c_struct_;
   };
 
@@ -604,8 +604,8 @@ public:
   // that described where it starts and ends in both the old and new versions in
   // the delta.
   class hunk : public libgit2_api {
-  public:
-    hunk(const git_diff_hunk *c_ptr) : c_struct_(*c_ptr) {}
+   public:
+    hunk(const git_diff_hunk* c_ptr) : c_struct_(*c_ptr) {}
 
     // Starting line number in old_file
     int old_start() const { return c_struct_.old_start; }
@@ -623,12 +623,12 @@ public:
     size_t header_length() const { return c_struct_.header_len; }
 
     // Header text, NUL-byte terminated
-    char const *header() const { return &(c_struct_.header[0]); }
+    char const* header() const { return &(c_struct_.header[0]); }
 
     // Access libgit2 C ptr
-    const git_diff_hunk *c_ptr() const { return &c_struct_; }
+    const git_diff_hunk* c_ptr() const { return &c_struct_; }
 
-  private:
+   private:
     git_diff_hunk c_struct_;
   };
 
@@ -650,34 +650,34 @@ public:
   // files will only be calculated if they are not NULL. Of course, these
   // callbacks will not be invoked for binary files on the diff or for files
   // whose only changed is a file mode change.
-  void for_each(std::function<void(const diff::delta &, float)> file_callback,
-                std::function<void(const diff::delta &, const diff::binary &)>
+  void for_each(std::function<void(const diff::delta&, float)> file_callback,
+                std::function<void(const diff::delta&, const diff::binary&)>
                     binary_callback = {},
-                std::function<void(const diff::delta &, const diff::hunk &)>
+                std::function<void(const diff::delta&, const diff::hunk&)>
                     hunk_callback = {},
-                std::function<void(const diff::delta &, const diff::hunk &,
-                                   const diff::line &)>
+                std::function<void(const diff::delta&, const diff::hunk&,
+                                   const diff::line&)>
                     line_callback = {});
 
   // Iterate over a diff generating formatted text output.
   void print(diff::format format,
-             std::function<void(const diff::delta &, const diff::hunk &,
-                                const diff::line &)>
+             std::function<void(const diff::delta&, const diff::hunk&,
+                                const diff::line&)>
                  line_callback);
 
   // Directly run a diff between a blob and a buffer.
   static void diff_blob_to_buffer(
-      const blob &old_blob, const std::string &old_as_path,
-      const char *new_buffer, size_t new_buffer_length,
-      const std::string &new_as_path,
-      const diff::options &options = diff::options(nullptr),
-      std::function<void(const diff::delta &, float)> file_callback = {},
-      std::function<void(const diff::delta &, const diff::binary &)>
+      const blob& old_blob, const std::string& old_as_path,
+      const char* new_buffer, size_t new_buffer_length,
+      const std::string& new_as_path,
+      const diff::options& options = diff::options(nullptr),
+      std::function<void(const diff::delta&, float)> file_callback = {},
+      std::function<void(const diff::delta&, const diff::binary&)>
           binary_callback = {},
-      std::function<void(const diff::delta &, const diff::hunk &)>
-          hunk_callback = {},
-      std::function<void(const diff::delta &, const diff::hunk &,
-                         const diff::line &)>
+      std::function<void(const diff::delta&, const diff::hunk&)> hunk_callback =
+          {},
+      std::function<void(const diff::delta&, const diff::hunk&,
+                         const diff::line&)>
           line_callback = {});
 
   // Directly run a diff between two buffers.
@@ -686,17 +686,17 @@ public:
   // the git_diff_file parameters to the callbacks will be faked a la the rules
   // for git_diff_blobs().
   static void diff_between_buffers(
-      const void *old_buffer, size_t old_buffer_length,
-      const std::string &old_as_path, const void *new_buffer,
-      size_t new_buffer_length, const std::string &new_as_path,
-      const diff::options &options = diff::options(nullptr),
-      std::function<void(const diff::delta &, float)> file_callback = {},
-      std::function<void(const diff::delta &, const diff::binary &)>
+      const void* old_buffer, size_t old_buffer_length,
+      const std::string& old_as_path, const void* new_buffer,
+      size_t new_buffer_length, const std::string& new_as_path,
+      const diff::options& options = diff::options(nullptr),
+      std::function<void(const diff::delta&, float)> file_callback = {},
+      std::function<void(const diff::delta&, const diff::binary&)>
           binary_callback = {},
-      std::function<void(const diff::delta &, const diff::hunk &)>
-          hunk_callback = {},
-      std::function<void(const diff::delta &, const diff::hunk &,
-                         const diff::line &)>
+      std::function<void(const diff::delta&, const diff::hunk&)> hunk_callback =
+          {},
+      std::function<void(const diff::delta&, const diff::hunk&,
+                         const diff::line&)>
           line_callback = {});
 
   // Flags to control the behavior of diff rename/copy detection.
@@ -769,7 +769,7 @@ public:
   // Control behavior of rename and copy detection
   // These options mostly mimic parameters that can be passed to git-diff.
   class find_options : public libgit2_api {
-  public:
+   public:
     find_options() : c_ptr_(nullptr) {
       auto ret = git_diff_find_init_options(&default_options_,
                                             GIT_DIFF_FIND_OPTIONS_VERSION);
@@ -778,7 +778,7 @@ public:
         throw git_exception();
     }
 
-    find_options(git_diff_find_options *c_ptr) : c_ptr_(c_ptr) {}
+    find_options(git_diff_find_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -835,10 +835,10 @@ public:
     // TODO: Add diff_simiarity_metric
 
     // Access libgit2 C ptr
-    const git_diff_find_options *c_ptr() const { return c_ptr_; }
+    const git_diff_find_options* c_ptr() const { return c_ptr_; }
 
-  private:
-    git_diff_find_options *c_ptr_;
+   private:
+    git_diff_find_options* c_ptr_;
     git_diff_find_options default_options_;
   };
 
@@ -848,11 +848,11 @@ public:
   // or copies with new entries reflecting those changes. This also will, if
   // requested, break modified files into add/remove pairs if the amount of
   // change is above a threshold.
-  void find_similar(const find_options &options = find_options());
+  void find_similar(const find_options& options = find_options());
 
   // Patch ID options structure
   class patchid_options : public libgit2_api {
-  public:
+   public:
     patchid_options() : c_ptr_(nullptr) {
       auto ret = git_diff_patchid_init_options(
           &default_options_, GIT_DIFF_PATCHID_OPTIONS_VERSION);
@@ -861,29 +861,29 @@ public:
         throw git_exception();
     }
 
-    patchid_options(git_diff_patchid_options *c_ptr) : c_ptr_(c_ptr) {}
+    patchid_options(git_diff_patchid_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
     void set_version(unsigned int version) { c_ptr_->version = version; }
 
     // Access libgit2 C ptr
-    const git_diff_patchid_options *c_ptr() const { return c_ptr_; }
+    const git_diff_patchid_options* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     friend diff;
-    git_diff_patchid_options *c_ptr_;
+    git_diff_patchid_options* c_ptr_;
     git_diff_patchid_options default_options_;
   };
 
   // Calculate the patch ID for the given patch.
-  oid patchid(const patchid_options &options = patchid_options());
+  oid patchid(const patchid_options& options = patchid_options());
 
-private:
+ private:
   friend class patch;
   friend class pathspec;
   friend class repository;
-  git_diff *c_ptr_;
+  git_diff* c_ptr_;
   ownership owner_;
 };
 ENABLE_BITMASK_OPERATORS(diff::delta::flag);
@@ -892,4 +892,4 @@ ENABLE_BITMASK_OPERATORS(diff::stats::format);
 ENABLE_BITMASK_OPERATORS(diff::format_email_flag);
 ENABLE_BITMASK_OPERATORS(diff::find_flag);
 
-} // namespace cppgit2
+}  // namespace cppgit2

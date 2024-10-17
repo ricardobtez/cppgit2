@@ -1,23 +1,23 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/libgit2_api.hpp>
-#include <git2.h>
 #include <string>
 #include <vector>
 
 namespace cppgit2 {
 
 class strarray : public libgit2_api {
-public:
+ public:
   // Default construction
   // Initializes libgit2
   strarray();
 
   // Construct from vector of strings
-  strarray(const std::vector<std::string> &strings);
+  strarray(const std::vector<std::string>& strings);
 
   // Construct from libgit2 C ptr
-  strarray(const git_strarray *c_ptr);
+  strarray(const git_strarray* c_ptr);
 
   // Free the git_strarray struct
   ~strarray();
@@ -30,20 +30,20 @@ public:
 
   // Iterator for use in range-based for loops
   class iterator {
-  public:
-    explicit iterator(char **ptr) : ptr_(ptr) {}
+   public:
+    explicit iterator(char** ptr) : ptr_(ptr) {}
 
     iterator operator++() {
       ++ptr_;
       return *this;
     }
 
-    bool operator!=(const iterator &other) const { return ptr_ != other.ptr_; }
+    bool operator!=(const iterator& other) const { return ptr_ != other.ptr_; }
 
     std::string operator*() { return std::string(*ptr_); }
 
-  private:
-    char **ptr_;
+   private:
+    char** ptr_;
   };
 
   iterator begin() { return iterator(&c_struct_.strings[0]); }
@@ -63,12 +63,12 @@ public:
   }
 
   // Access libgit2 C ptr
-  const git_strarray *c_ptr() const;
+  const git_strarray* c_ptr() const;
 
-private:
+ private:
   friend class remote;
   friend class repository;
   git_strarray c_struct_;
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

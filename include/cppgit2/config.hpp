@@ -1,19 +1,19 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/data_buffer.hpp>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/ownership.hpp>
 #include <cppgit2/transaction.hpp>
 #include <functional>
-#include <git2.h>
 #include <string>
 
 namespace cppgit2 {
 
 class config : public libgit2_api {
-public:
+ public:
   config();
-  config(git_config *c_ptr, ownership owner = ownership::libgit2);
+  config(git_config* c_ptr, ownership owner = ownership::libgit2);
   ~config();
 
   // Priority levels correspond to natural escalation logic
@@ -30,13 +30,13 @@ public:
 
   // An entry in the configuration file
   class entry : public libgit2_api {
-  public:
+   public:
     // Default constructed config entry
     entry() : c_ptr_(nullptr), owner_(ownership::libgit2) {}
 
     // Construct from libgit2 C ptr
     // If owned by user, free'd in destructor
-    entry(git_config_entry *c_ptr, ownership owner = ownership::libgit2)
+    entry(git_config_entry* c_ptr, ownership owner = ownership::libgit2)
         : c_ptr_(c_ptr), owner_(owner) {}
 
     // Free config entry if needed
@@ -70,21 +70,21 @@ public:
     }
 
     // Access to libgit2 C ptr
-    const git_config_entry *c_ptr() const { return c_ptr_; }
+    const git_config_entry* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     friend config;
-    git_config_entry *c_ptr_;
+    git_config_entry* c_ptr_;
     ownership owner_;
   };
 
   // Delete a config variable from the config file with the
   // highest level (usually the local one)
-  void delete_entry(const std::string &name);
+  void delete_entry(const std::string& name);
 
   // Remove one or several entries from a multivar in the
   // local config file
-  void delete_entry(const std::string &name, const std::string &regexp);
+  void delete_entry(const std::string& name, const std::string& regexp);
 
   // Locate path to the global config file
   static std::string locate_global_config();
@@ -104,12 +104,12 @@ public:
   // Open global/XDG config file according to git's rules
   // Git allows to store global config in $HOME/.gitconfig
   // or $XDG_CONFIG_HOME/git/config.
-  static config open_global_config(config &conf);
+  static config open_global_config(config& conf);
 
   // Build a single-level focused config object from
   // a multi-level one. The returned config object can be used
   // to perform get/set/delete operations on a specific level.
-  static config open_config_at_level(const config &parent,
+  static config open_config_at_level(const config& parent,
                                      priority_level level);
 
   // Locate the path to the global xdg-compatible config file
@@ -117,28 +117,28 @@ public:
   static std::string locate_global_xdg_compatible_config();
 
   // Get the config entry of a config variable
-  entry operator[](const std::string &name);
+  entry operator[](const std::string& name);
 
   // Getters
-  bool value_as_bool(const std::string &name);
-  int32_t value_as_int32(const std::string &name);
-  int64_t value_as_int64(const std::string &name);
-  std::string value_as_string(const std::string &name);
-  data_buffer value_as_data_buffer(const std::string &name);
+  bool value_as_bool(const std::string& name);
+  int32_t value_as_int32(const std::string& name);
+  int64_t value_as_int64(const std::string& name);
+  std::string value_as_string(const std::string& name);
+  data_buffer value_as_data_buffer(const std::string& name);
 
   // Value of a path config variable
   // A leading '~' will be expanded to the global search path
-  std::string path(const std::string &name);
+  std::string path(const std::string& name);
 
   // Insert entry
-  void insert_entry(const std::string &name, bool value);
-  void insert_entry(const std::string &name, int32_t value);
-  void insert_entry(const std::string &name, int64_t value);
-  void insert_entry(const std::string &name, const std::string &value);
+  void insert_entry(const std::string& name, bool value);
+  void insert_entry(const std::string& name, int32_t value);
+  void insert_entry(const std::string& name, int64_t value);
+  void insert_entry(const std::string& name, const std::string& value);
 
   // Set a multivar in the local config file
-  void insert_multiple(const std::string &name, const std::string &regexp,
-                       const std::string &new_value);
+  void insert_multiple(const std::string& name, const std::string& regexp,
+                       const std::string& new_value);
 
   // Lock the backend with the highest priority
   // Use returned transaction to commit or undo the changes
@@ -149,20 +149,20 @@ public:
   // Valid values:
   // true: 'true', 'yes', 'on', number != 0
   // false: 'false', 'no', 'off', 0
-  static bool parse_as_bool(const std::string &value);
+  static bool parse_as_bool(const std::string& value);
 
   // An optional value suffix of 'k', 'm', or 'g'
   // will cause the value to be multiplied by 1024,
   // 1048576, or 1073741824
-  static int32_t parse_as_int32(const std::string &value);
+  static int32_t parse_as_int32(const std::string& value);
 
   // Similar to parse_as_int32
-  static int64_t parse_as_int64(const std::string &value);
+  static int64_t parse_as_int64(const std::string& value);
 
   // A leading '~' will be expanded to the global search path
   // (which defaults to the user's home directory) but can
   // be overridden via git_libgit2_opts()
-  static std::string parse_path(const std::string &value);
+  static std::string parse_path(const std::string& value);
 
   // Create a snapshot of the configuration
   config snapshot();
@@ -170,19 +170,19 @@ public:
   size_t size() const;
 
   // Perform an operation on each config variable
-  void for_each(std::function<void(const entry &)> visitor);
+  void for_each(std::function<void(const entry&)> visitor);
 
   // Perform an operation on each config variable matching a regular expression.
-  void for_each(const std::string &regexp,
-                std::function<void(const entry &)> visitor);
+  void for_each(const std::string& regexp,
+                std::function<void(const entry&)> visitor);
 
   // Access libgit2 C ptr
-  const git_config *c_ptr() const;
+  const git_config* c_ptr() const;
 
-private:
+ private:
   friend class repository;
-  git_config *c_ptr_;
+  git_config* c_ptr_;
   ownership owner_;
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

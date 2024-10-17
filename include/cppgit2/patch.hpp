@@ -1,44 +1,44 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/data_buffer.hpp>
 #include <cppgit2/diff.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/ownership.hpp>
 #include <functional>
-#include <git2.h>
 #include <string>
 #include <tuple>
 
 namespace cppgit2 {
 
 class patch : public libgit2_api {
-public:
+ public:
   // Default construct a patch object
   patch();
 
   // Construct from libgit2 C ptr
-  patch(git_patch *c_ptr, ownership owner = ownership::libgit2);
+  patch(git_patch* c_ptr, ownership owner = ownership::libgit2);
 
   // Directly generate a patch from the difference between a blob and a buffer.
-  patch(const blob &old_blob, const std::string &old_as_path,
-        const void *buffer, size_t buffer_length,
-        const std::string &buffer_as_path,
-        const diff::options &options = diff::options());
+  patch(const blob& old_blob, const std::string& old_as_path,
+        const void* buffer, size_t buffer_length,
+        const std::string& buffer_as_path,
+        const diff::options& options = diff::options());
 
   // Directly generate a patch from the difference between two blobs.
-  patch(const blob &old_blob, const std::string &old_as_path,
-        const blob &new_blob, const std::string &new_as_path,
-        const diff::options &options = diff::options());
+  patch(const blob& old_blob, const std::string& old_as_path,
+        const blob& new_blob, const std::string& new_as_path,
+        const diff::options& options = diff::options());
 
   // Directly generate a patch from the difference between two buffers.
-  patch(const void *old_buffer, size_t old_buffer_length,
-        const std::string &old_as_path, const void *new_buffer,
-        size_t new_buffer_length, const std::string &new_as_path,
-        const diff::options &options = diff::options());
+  patch(const void* old_buffer, size_t old_buffer_length,
+        const std::string& old_as_path, const void* new_buffer,
+        size_t new_buffer_length, const std::string& new_as_path,
+        const diff::options& options = diff::options());
 
   // Return a patch for an entry in the diff list.
   // The git_patch is a newly created object contains the text diffs for the
   // delta.
-  patch(const diff &diff, size_t index);
+  patch(const diff& diff, size_t index);
 
   // Cleanup patch object
   ~patch();
@@ -68,8 +68,8 @@ public:
   size_t num_lines_in_hunk(size_t hunk_index) const;
 
   // Serialize the patch to text via callback.
-  void print(std::function<void(const diff::delta &, const diff::hunk &,
-                                const diff::line &)>
+  void print(std::function<void(const diff::delta&, const diff::hunk&,
+                                const diff::line&)>
                  line_callback);
 
   // Look up size of patch diff data in bytes
@@ -84,11 +84,11 @@ public:
   data_buffer to_buffer();
 
   // Access to libgit2 C ptr
-  const git_patch *c_ptr() const;
+  const git_patch* c_ptr() const;
 
-private:
+ private:
   ownership owner_;
-  git_patch *c_ptr_;
+  git_patch* c_ptr_;
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

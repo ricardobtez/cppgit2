@@ -1,4 +1,5 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/data_buffer.hpp>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/libgit2_api.hpp>
@@ -7,22 +8,21 @@
 #include <cppgit2/signature.hpp>
 #include <cppgit2/time.hpp>
 #include <cppgit2/tree.hpp>
-#include <git2.h>
 #include <string>
 
 namespace cppgit2 {
 
 class commit : public libgit2_api {
-public:
+ public:
   commit();
-  commit(git_commit *c_ptr, ownership owner = ownership::libgit2);
+  commit(git_commit* c_ptr, ownership owner = ownership::libgit2);
   ~commit();
 
   // Amend an existing commit by replacing only non-NULL values
-  void amend(const oid &id, const std::string &update_ref,
-             const signature &author, const signature &committer,
-             const std::string &message_encoding, const std::string &message,
-             const tree &tree);
+  void amend(const oid& id, const std::string& update_ref,
+             const signature& author, const signature& committer,
+             const std::string& message_encoding, const std::string& message,
+             const tree& tree);
 
   // Author of this commit
   signature author() const;
@@ -37,7 +37,7 @@ public:
   commit copy() const;
 
   // Get an arbitrary header field
-  std::string operator[](const std::string &field) const;
+  std::string operator[](const std::string& field) const;
 
   // SHA-1 hash of this commit
   oid id() const;
@@ -92,12 +92,12 @@ public:
   class repository owner() const;
 
   // Access libgit2 C ptr
-  const git_commit *c_ptr() const;
+  const git_commit* c_ptr() const;
 
-private:
+ private:
   friend class repository;
-  git_commit *c_ptr_;
+  git_commit* c_ptr_;
   ownership owner_;
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2
