@@ -7,21 +7,23 @@ namespace cppgit2 {
  */
 char git_buf__initbuf[1];
 /* Use to initialize buffer structure when git_buf is on stack */
-#define GIT_BUF_INIT                                                           \
+#define GIT_BUF_INIT \
   { git_buf__initbuf, 0, 0 }
 
-data_buffer::data_buffer() { c_struct_ = GIT_BUF_INIT; }
+data_buffer::data_buffer() {
+  c_struct_ = GIT_BUF_INIT;
+}
 
 data_buffer::data_buffer(size_t n) {
-  c_struct_.ptr = (char *)malloc(n * sizeof(char));
+  c_struct_.ptr = (char*)malloc(n * sizeof(char));
   if (c_struct_.ptr)
     memset(c_struct_.ptr, '\0', n * sizeof(char));
   c_struct_.asize = n;
   c_struct_.size = 0;
 }
 
-data_buffer::data_buffer(const git_buf *c_ptr) {
-  c_struct_.ptr = (char *)malloc(c_ptr->asize * sizeof(char));
+data_buffer::data_buffer(const git_buf* c_ptr) {
+  c_struct_.ptr = (char*)malloc(c_ptr->asize * sizeof(char));
   c_struct_.asize = c_ptr->asize;
   c_struct_.size = c_ptr->size;
   if (c_struct_.ptr)
@@ -42,9 +44,11 @@ void data_buffer::grow_to_size(size_t target_size) {
     throw git_exception();
 }
 
-bool data_buffer::is_binary() const { return git_buf_is_binary(&c_struct_); }
+bool data_buffer::is_binary() const {
+  return git_buf_is_binary(&c_struct_);
+}
 
-void data_buffer::set_buffer(const std::string &buffer) {
+void data_buffer::set_buffer(const std::string& buffer) {
   if (git_buf_set(&c_struct_, buffer.c_str(), buffer.size()))
     throw git_exception();
 }
@@ -56,8 +60,12 @@ std::string data_buffer::to_string() const {
     return "";
 }
 
-git_buf *data_buffer::c_ptr() { return &c_struct_; }
+git_buf* data_buffer::c_ptr() {
+  return &c_struct_;
+}
 
-const git_buf *data_buffer::c_ptr() const { return &c_struct_; }
+const git_buf* data_buffer::c_ptr() const {
+  return &c_struct_;
+}
 
-} // namespace cppgit2
+}  // namespace cppgit2

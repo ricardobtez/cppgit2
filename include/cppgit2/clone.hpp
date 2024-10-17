@@ -1,17 +1,17 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/checkout.hpp>
 #include <cppgit2/fetch.hpp>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/libgit2_api.hpp>
-#include <git2.h>
 #include <string>
 
 namespace cppgit2 {
 
 class clone : public libgit2_api {
-public:
+ public:
   class options : public libgit2_api {
-  public:
+   public:
     options() : c_ptr_(nullptr) {
       auto ret =
           git_clone_init_options(&default_options_, GIT_CLONE_OPTIONS_VERSION);
@@ -20,7 +20,7 @@ public:
         throw git_exception();
     }
 
-    options(git_clone_options *c_ptr) : c_ptr_(c_ptr) {}
+    options(git_clone_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -30,7 +30,7 @@ public:
     checkout::options checkout_options() const {
       return checkout::options(&c_ptr_->checkout_opts);
     }
-    void set_checkout_options(const checkout::options &checkout_options) {
+    void set_checkout_options(const checkout::options& checkout_options) {
       c_ptr_->checkout_opts = *(checkout_options.c_ptr());
     }
 
@@ -38,7 +38,7 @@ public:
     fetch::options fetch_options() const {
       return fetch::options(&c_ptr_->fetch_opts);
     }
-    void set_fetch_options(const fetch::options &fetch_options) {
+    void set_fetch_options(const fetch::options& fetch_options) {
       c_ptr_->fetch_opts = *(fetch_options.c_ptr());
     }
 
@@ -80,17 +80,17 @@ public:
       auto ret = c_ptr_->checkout_branch;
       return ret ? std::string(ret) : "";
     }
-    void set_checkout_branch_name(const std::string &checkout_branch_name) {
+    void set_checkout_branch_name(const std::string& checkout_branch_name) {
       c_ptr_->checkout_branch = checkout_branch_name.c_str();
     }
 
     // Access libgit2 C ptr
-    const git_clone_options *c_ptr() const { return c_ptr_; }
+    const git_clone_options* c_ptr() const { return c_ptr_; }
 
-  private:
-    git_clone_options *c_ptr_;
+   private:
+    git_clone_options* c_ptr_;
     git_clone_options default_options_;
   };
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

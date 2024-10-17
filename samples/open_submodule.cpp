@@ -1,7 +1,7 @@
 #include <cppgit2/repository.hpp>
 using namespace cppgit2;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   if (argc == 3) {
     auto repo = repository::open(argv[1]);
     auto sm = repo.lookup_submodule(argv[2]);
@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 
     std::cout << "References\n:";
     submodule_repo.for_each_reference(
-        [](const reference &ref) { std::cout << ref.name() << std::endl; });
+        [](const reference& ref) { std::cout << ref.name() << std::endl; });
 
   } else {
     // Example usage: ./samples/repository_open_submodule ../. "ext/libgit2"

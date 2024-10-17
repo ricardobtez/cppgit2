@@ -1,11 +1,11 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/file_mode.hpp>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/object.hpp>
 #include <cppgit2/ownership.hpp>
 #include <functional>
-#include <git2.h>
 #include <memory>
 #include <string>
 #include <utility>
@@ -13,29 +13,29 @@
 namespace cppgit2 {
 
 class tree : public libgit2_api {
-public:
+ public:
   // Default construct a tree
   tree();
 
   // Construct from libgit2 C ptr
   // If owned by user, will be free'd in destructor
-  tree(git_tree *c_ptr, ownership owner = ownership::libgit2);
+  tree(git_tree* c_ptr, ownership owner = ownership::libgit2);
 
   // Cleanup
   ~tree();
 
   class entry : public libgit2_api {
-  public:
+   public:
     // Default construction
     entry() : c_ptr_(nullptr), owner_(ownership::libgit2) {}
 
     // Construct from libgit2 C ptr
     // If owned by user, will be free'd in destructor
-    entry(git_tree_entry *c_ptr, ownership owner = ownership::libgit2)
+    entry(git_tree_entry* c_ptr, ownership owner = ownership::libgit2)
         : c_ptr_(c_ptr), owner_(owner) {}
 
-    entry(const git_tree_entry *c_ptr)
-        : c_ptr_(const_cast<git_tree_entry *>(c_ptr)),
+    entry(const git_tree_entry* c_ptr)
+        : c_ptr_(const_cast<git_tree_entry*>(c_ptr)),
           owner_(ownership::libgit2) {}
 
     // Clean up tree entry
@@ -83,18 +83,18 @@ public:
     // < 0 if this is before e2
     //   0 if this == e2
     // > 0 if this is after e2
-    int compare(const entry &e2) {
+    int compare(const entry& e2) {
       return git_tree_entry_cmp(c_ptr_, e2.c_ptr());
     }
 
     // Access libgit2 C ptr
-    git_tree_entry *c_ptr() { return c_ptr_; }
-    const git_tree_entry *c_ptr() const { return c_ptr_; }
+    git_tree_entry* c_ptr() { return c_ptr_; }
+    const git_tree_entry* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     friend tree;
     friend class tree_builder;
-    git_tree_entry *c_ptr_;
+    git_tree_entry* c_ptr_;
     ownership owner_;
   };
 
@@ -107,7 +107,7 @@ public:
   // Lookup tree entry by SHA value
   // Returned entry is owned by the tree
   // This must examine every entry in the tree, so it's not fast
-  entry lookup_entry_by_id(const oid &id) const;
+  entry lookup_entry_by_id(const oid& id) const;
 
   // Lookup tree entry by its position in the tree
   // Returned entry is owned by the tree
@@ -115,11 +115,11 @@ public:
 
   // Lookup tree entry by its filename
   // Returned entry is owned by the tree
-  entry lookup_entry_by_name(const std::string &filename) const;
+  entry lookup_entry_by_name(const std::string& filename) const;
 
   // Lookup tree entry given its relative path
   // Returned tree entry is owned by the user
-  entry lookup_entry_by_path(const std::string &path) const;
+  entry lookup_entry_by_path(const std::string& path) const;
 
   // Number of entries in tree
   size_t size() const;
@@ -132,16 +132,16 @@ public:
 
   // Traverse the entries in a tree and its subtrees in post or pre order.
   void walk(traversal_mode mode,
-            std::function<void(const std::string &, const tree::entry &)>
-                visitor) const;
+            std::function<void(const std::string&, const tree::entry&)> visitor)
+      const;
 
   enum class update_type {
-    upsert, // Update or insert an entry at the specified path
-    remove  // Remove an entry from the specified path
+    upsert,  // Update or insert an entry at the specified path
+    remove   // Remove an entry from the specified path
   };
 
   class update : public libgit2_api {
-  public:
+   public:
     tree::update_type action() const {
       return static_cast<tree::update_type>(c_struct_.action);
     }
@@ -152,7 +152,7 @@ public:
 
     oid id() const { return oid(&c_struct_.id); }
 
-    void set_id(const oid &id) { c_struct_.id = *(id.c_ptr()); }
+    void set_id(const oid& id) { c_struct_.id = *(id.c_ptr()); }
 
     cppgit2::file_mode file_mode() const {
       return static_cast<cppgit2::file_mode>(c_struct_.filemode);
@@ -169,23 +169,23 @@ public:
         return "";
     }
 
-    void set_path(const std::string &path) { c_struct_.path = path.c_str(); }
+    void set_path(const std::string& path) { c_struct_.path = path.c_str(); }
 
-  private:
+   private:
     friend class repository;
     git_tree_update c_struct_;
   };
 
   // Access libgit2 C ptr
-  git_tree *c_ptr();
-  const git_tree *c_ptr() const;
+  git_tree* c_ptr();
+  const git_tree* c_ptr() const;
 
-private:
+ private:
   friend class commit;
   friend class pathspec;
   friend class repository;
-  git_tree *c_ptr_;
+  git_tree* c_ptr_;
   ownership owner_;
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

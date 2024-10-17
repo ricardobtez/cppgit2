@@ -4,7 +4,7 @@ namespace cppgit2 {
 
 submodule::submodule() : c_ptr_(nullptr), owner_(ownership::libgit2) {}
 
-submodule::submodule(git_submodule *c_ptr, ownership owner)
+submodule::submodule(git_submodule* c_ptr, ownership owner)
     : c_ptr_(c_ptr), owner_(owner) {}
 
 submodule::~submodule() {
@@ -40,7 +40,9 @@ submodule::recurse submodule::recurse_submodules_option() const {
       git_submodule_fetch_recurse_submodules(c_ptr_));
 }
 
-oid submodule::head_id() const { return oid(git_submodule_head_id(c_ptr_)); }
+oid submodule::head_id() const {
+  return oid(git_submodule_head_id(c_ptr_));
+}
 
 submodule::ignore submodule::ignore_option() const {
   return static_cast<submodule::ignore>(git_submodule_ignore(c_ptr_));
@@ -58,7 +60,9 @@ submodule::update_strategy submodule::get_update_strategy() const {
       git_submodule_update_strategy(c_ptr_));
 }
 
-oid submodule::index_id() const { return oid(git_submodule_index_id(c_ptr_)); }
+oid submodule::index_id() const {
+  return oid(git_submodule_index_id(c_ptr_));
+}
 
 std::string submodule::name() const {
   auto ret = git_submodule_name(c_ptr_);
@@ -112,18 +116,20 @@ submodule::status submodule::location_status() const {
   return static_cast<submodule::status>(result);
 }
 
-repository submodule::clone(const update_options &options) {
+repository submodule::clone(const update_options& options) {
   repository result;
   if (git_submodule_clone(&result.c_ptr_, c_ptr_, options.c_ptr_))
     throw git_exception();
   return result;
 }
 
-void submodule::update(bool init, const update_options &options) {
+void submodule::update(bool init, const update_options& options) {
   if (git_submodule_update(c_ptr_, init, options.c_ptr_))
     throw git_exception();
 }
 
-const git_submodule *submodule::c_ptr() const { return c_ptr_; }
+const git_submodule* submodule::c_ptr() const {
+  return c_ptr_;
+}
 
-} // namespace cppgit2
+}  // namespace cppgit2

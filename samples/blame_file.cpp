@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace cppgit2;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   if (argc == 3) {
     auto repo = repository::init(argv[1], false);
     auto blame = repo.blame_file(argv[2]);

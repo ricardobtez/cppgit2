@@ -1,11 +1,11 @@
 #pragma once
-#include <cppgit2/bitmask_operators.hpp>
 #include <git2.h>
+#include <cppgit2/bitmask_operators.hpp>
 
 namespace cppgit2 {
 
 class revparse {
-public:
+ public:
   // Revparse flags.  These indicate the intended behavior of the spec passed to
   // git_revparse
   enum class mode {
@@ -21,4 +21,4 @@ public:
 };
 ENABLE_BITMASK_OPERATORS(revparse::mode);
 
-} // namespace cppgit2
+}  // namespace cppgit2

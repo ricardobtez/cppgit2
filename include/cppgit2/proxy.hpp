@@ -1,20 +1,20 @@
 #pragma once
-#include <cppgit2/libgit2_api.hpp>
 #include <git2.h>
+#include <cppgit2/libgit2_api.hpp>
 
 namespace cppgit2 {
 
 class proxy : public libgit2_api {
-public:
+ public:
   // The type of proxy to use.
   enum class proxy_type {
-    none,     // Do not attempt to connect through a proxy
-    auto_,    // Try to auto-detect the proxy from the git configuration.
-    specified // Connect via the URL given in the options
+    none,      // Do not attempt to connect through a proxy
+    auto_,     // Try to auto-detect the proxy from the git configuration.
+    specified  // Connect via the URL given in the options
   };
 
   class options : public libgit2_api {
-  public:
+   public:
     options() {
       auto ret =
           git_proxy_init_options(&default_options_, GIT_PROXY_OPTIONS_VERSION);
@@ -23,7 +23,7 @@ public:
         throw git_exception();
     }
 
-    options(git_proxy_options *c_ptr) : c_ptr_(c_ptr) {}
+    options(git_proxy_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -43,16 +43,16 @@ public:
         return std::string(c_ptr_->url);
       return "";
     }
-    void set_url(const std::string &url) { c_ptr_->url = url.c_str(); }
+    void set_url(const std::string& url) { c_ptr_->url = url.c_str(); }
 
     // Access libgit2 C ptr
-    const git_proxy_options *c_ptr() const { return c_ptr_; }
+    const git_proxy_options* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     friend proxy;
-    git_proxy_options *c_ptr_;
+    git_proxy_options* c_ptr_;
     git_proxy_options default_options_;
   };
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

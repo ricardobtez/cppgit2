@@ -1,24 +1,24 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/bitmask_operators.hpp>
 #include <cppgit2/data_buffer.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/ownership.hpp>
 #include <cppgit2/reference.hpp>
 #include <cppgit2/strarray.hpp>
-#include <git2.h>
 #include <string>
 #include <utility>
 
 namespace cppgit2 {
 
 class worktree : public libgit2_api {
-public:
+ public:
   // Default construct a worktree
   worktree();
 
   // Construct from libgit2 C ptr
   // If owned by user, will be free'd in the destructor
-  worktree(git_worktree *c_ptr, ownership owner = ownership::libgit2);
+  worktree(git_worktree* c_ptr, ownership owner = ownership::libgit2);
 
   // Free worktree if owned by user
   ~worktree();
@@ -46,7 +46,7 @@ public:
   //
   // Lock a worktree, optionally specifying a reason why the linked working tree
   // is being locked.
-  void lock(const std::string &reason = "");
+  void lock(const std::string& reason = "");
 
   // Retrieve the name of the worktree
   std::string name() const;
@@ -79,7 +79,7 @@ public:
   bool validate();
 
   class add_options : public libgit2_api {
-  public:
+   public:
     add_options() : c_ptr_(nullptr) {
       auto ret = git_worktree_add_init_options(
           &default_options_, GIT_WORKTREE_ADD_OPTIONS_VERSION);
@@ -88,7 +88,7 @@ public:
         throw git_exception();
     }
 
-    add_options(git_worktree_add_options *c_ptr) : c_ptr_(c_ptr) {}
+    add_options(git_worktree_add_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -102,15 +102,15 @@ public:
     cppgit2::reference reference() const {
       return cppgit2::reference(c_ptr_->ref);
     }
-    void set_reference(const cppgit2::reference &ref) {
-      c_ptr_->ref = const_cast<git_reference *>(ref.c_ptr());
+    void set_reference(const cppgit2::reference& ref) {
+      c_ptr_->ref = const_cast<git_reference*>(ref.c_ptr());
     }
 
     // Access libgit2 C ptr
-    const git_worktree_add_options *c_ptr() const { return c_ptr_; }
+    const git_worktree_add_options* c_ptr() const { return c_ptr_; }
 
-  private:
-    git_worktree_add_options *c_ptr_;
+   private:
+    git_worktree_add_options* c_ptr_;
     git_worktree_add_options default_options_;
   };
 
@@ -135,7 +135,7 @@ public:
         throw git_exception();
     }
 
-    prune_options(git_worktree_prune_options *c_ptr) : c_ptr_(c_ptr) {}
+    prune_options(git_worktree_prune_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -148,21 +148,21 @@ public:
     }
 
     // Access libgit2 C ptr
-    const git_worktree_prune_options *c_ptr() const { return c_ptr_; }
+    const git_worktree_prune_options* c_ptr() const { return c_ptr_; }
 
-  private:
-    git_worktree_prune_options *c_ptr_;
+   private:
+    git_worktree_prune_options* c_ptr_;
     git_worktree_prune_options default_options_;
   };
 
   // Access libgit2 C ptr
-  const git_worktree *c_ptr() const;
+  const git_worktree* c_ptr() const;
 
-private:
+ private:
   friend class repository;
-  git_worktree *c_ptr_;
+  git_worktree* c_ptr_;
   ownership owner_;
 };
 ENABLE_BITMASK_OPERATORS(worktree::prune_type);
 
-} // namespace cppgit2
+}  // namespace cppgit2

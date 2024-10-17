@@ -1,15 +1,15 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/checkout.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/merge.hpp>
-#include <git2.h>
 
 namespace cppgit2 {
 
 class cherrypick : public libgit2_api {
-public:
+ public:
   class options : public libgit2_api {
-  public:
+   public:
     options() : c_ptr_(nullptr) {
       auto ret = git_cherrypick_init_options(&default_options_,
                                              GIT_CHERRYPICK_OPTIONS_VERSION);
@@ -18,7 +18,7 @@ public:
         throw git_exception();
     }
 
-    options(git_cherrypick_options *c_ptr) : c_ptr_(c_ptr) {}
+    options(git_cherrypick_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -33,7 +33,7 @@ public:
     checkout::options checkout_options() const {
       return checkout::options(&c_ptr_->checkout_opts);
     }
-    void set_checkout_options(const checkout::options &checkout_options) {
+    void set_checkout_options(const checkout::options& checkout_options) {
       c_ptr_->checkout_opts = *(checkout_options.c_ptr());
     }
 
@@ -41,16 +41,16 @@ public:
     merge::options merge_options() const {
       return merge::options(&c_ptr_->merge_opts);
     }
-    void set_merge_options(const merge::options &merge_options) {
+    void set_merge_options(const merge::options& merge_options) {
       c_ptr_->merge_opts = *(merge_options.c_ptr());
     }
 
-    const git_cherrypick_options *c_ptr() const { return c_ptr_; }
+    const git_cherrypick_options* c_ptr() const { return c_ptr_; }
 
-  private:
-    git_cherrypick_options *c_ptr_;
+   private:
+    git_cherrypick_options* c_ptr_;
     git_cherrypick_options default_options_;
   };
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

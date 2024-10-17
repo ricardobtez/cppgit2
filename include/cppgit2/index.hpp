@@ -1,4 +1,5 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/bitmask_operators.hpp>
 #include <cppgit2/file_mode.hpp>
 #include <cppgit2/libgit2_api.hpp>
@@ -7,13 +8,12 @@
 #include <cppgit2/strarray.hpp>
 #include <cppgit2/tree.hpp>
 #include <functional>
-#include <git2.h>
 #include <string>
 
 namespace cppgit2 {
 
 class index : public libgit2_api {
-public:
+ public:
   // Default construct in-memory index object
   // Cannot be read/written to the filesystem
   // May be used to perform in-memory index operations
@@ -21,11 +21,11 @@ public:
 
   // Construct from libgit2 C ptr
   // If owned by user, will be free'd in the destructor
-  index(git_index *c_ptr, ownership owner = ownership::libgit2);
+  index(git_index* c_ptr, ownership owner = ownership::libgit2);
 
   // Create a new bare index object as a memory representation
   // of the Git index file in `index_path`, without a repo to back it
-  index(const std::string &path);
+  index(const std::string& path);
 
   // Free index object if owned by user
   ~index();
@@ -39,13 +39,13 @@ public:
   // File entry in index
   // Owned by libgit2
   class entry : public libgit2_api {
-  public:
+   public:
     // Default construct a file entry
     entry() { c_ptr_ = &default_; }
 
     // Construct from libgit2 C ptr
     // If owned by user, will be free'd in destructor
-    entry(git_index_entry *c_ptr) : c_ptr_(c_ptr) {
+    entry(git_index_entry* c_ptr) : c_ptr_(c_ptr) {
       if (!c_ptr)
         c_ptr_ = &default_;
     }
@@ -109,7 +109,7 @@ public:
 
     oid id() const { return oid(&c_ptr_->id); }
 
-    void set_id(const oid &id) { c_ptr_->id = *(id.c_ptr()); }
+    void set_id(const oid& id) { c_ptr_->id = *(id.c_ptr()); }
 
     flag flags() const { return static_cast<flag>(c_ptr_->flags); }
 
@@ -124,7 +124,7 @@ public:
         return "";
     }
 
-    void set_path(const std::string &path) { c_ptr_->path = path.c_str(); }
+    void set_path(const std::string& path) { c_ptr_->path = path.c_str(); }
 
     // Return the stage number from a git index entry
     // This entry is calculated from the entry's flag attribute like this:
@@ -136,11 +136,11 @@ public:
     bool is_conflict() const { return git_index_entry_is_conflict(c_ptr_); }
 
     // Access libgit2 C ptr
-    const git_index_entry *c_ptr() const { return c_ptr_; }
+    const git_index_entry* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     friend class index;
-    git_index_entry *c_ptr_;
+    git_index_entry* c_ptr_;
     git_index_entry default_;
   };
 
@@ -162,28 +162,28 @@ public:
 
   // Git index stage states
   enum class stage {
-    any = -1, // Some index APIs take a stage to match; pass this value to match
-              // any entry matching the path regardless of stage.
-    normal = 0,   // A normal staged file in the index.
-    ancestor = 1, // The ancestor side of a conflict.
-    ours = 2,     // The "ours" side of a conflict.
-    theirs = 3,   // The "theirs" side of a conflict.
+    any =
+        -1,  // Some index APIs take a stage to match; pass this value to match
+             // any entry matching the path regardless of stage.
+    normal = 0,    // A normal staged file in the index.
+    ancestor = 1,  // The ancestor side of a conflict.
+    ours = 2,      // The "ours" side of a conflict.
+    theirs = 3,    // The "theirs" side of a conflict.
   };
 
   // Add or update an index entry from an in-memory struct
-  void add_entry(const entry &source_entry);
+  void add_entry(const entry& source_entry);
 
   // Add or update index entries matching files in the working directory.
   void add_entries_that_match(
-      const std::vector<std::string> &pathspec, add_option flags,
-      std::function<int(const std::string &, const std::string &)> callback =
-          {});
+      const std::vector<std::string>& pathspec, add_option flags,
+      std::function<int(const std::string&, const std::string&)> callback = {});
 
   // Add or update an index entry from a file on disk
-  void add_entry_by_path(const std::string &path);
+  void add_entry_by_path(const std::string& path);
 
   // Add or update an index entry from a buffer in memory
-  void add_entry_from_buffer(const entry &entry, const std::string &buffer);
+  void add_entry_from_buffer(const entry& entry, const std::string& buffer);
 
   // Read index capabilities flags.
   capability capability_flags() const;
@@ -197,33 +197,33 @@ public:
 
   // Add or update index entries to represent a conflict.
   // Any staged entries that exist at the given paths will be removed.
-  void add_conflict_entry(const entry &ancestor_entry, const entry &our_entry,
-                          const entry &their_entry);
+  void add_conflict_entry(const entry& ancestor_entry, const entry& our_entry,
+                          const entry& their_entry);
 
   // Remove all conflicts in the index (entries with a stage greater than 0).
   void remove_all_conflicts();
 
   // Removes the index entries that represent a conflict of a single file.
-  void remove_conflict_entries(const std::string &path);
+  void remove_conflict_entries(const std::string& path);
 
   // Get the count of entries currently in the index
   size_t size() const;
 
   // Find the first position of any entries which point to given path in the Git
   // index.
-  size_t find_first(const std::string &path);
+  size_t find_first(const std::string& path);
 
   // Find the first position of any entries matching a prefix.
   // To find the first position of a path inside a given folder, suffix the
   // prefix with a '/'.
-  size_t find_first_matching_prefix(const std::string &prefix);
+  size_t find_first_matching_prefix(const std::string& prefix);
 
   // Run operation for each entry in index
-  void for_each(std::function<void(const entry &)> visitor);
+  void for_each(std::function<void(const entry&)> visitor);
 
   // Run operator for each conflict in index
   void for_each_conflict(
-      std::function<void(const entry &, const entry &, const entry &)> visitor);
+      std::function<void(const entry&, const entry&, const entry&)> visitor);
 
   // Get one of the entries in the index
   const entry operator[](size_t index);
@@ -232,7 +232,7 @@ public:
   // The entry is not modifiable and should not be freed. Because the
   // git_index_entry struct is a publicly defined struct, you should be able to
   // make your own permanent copy of the data if necessary.
-  const entry entry_in_path(const std::string &path, stage stage);
+  const entry entry_in_path(const std::string& path, stage stage);
 
   // Determine if the index contains entries representing file conflicts.
   bool has_conflicts() const;
@@ -249,22 +249,21 @@ public:
   void read(bool force);
 
   // Read a tree into the index file with stats
-  void read_tree(const tree &tree);
+  void read_tree(const tree& tree);
 
   // Remove an entry from the index
-  void remove_entry(const std::string &path, stage stage);
+  void remove_entry(const std::string& path, stage stage);
 
   // Remove all matching index entries.
   void remove_entries_that_match(
-      const std::vector<std::string> &pathspec,
-      std::function<int(const std::string &, const std::string &)> callback =
-          {});
+      const std::vector<std::string>& pathspec,
+      std::function<int(const std::string&, const std::string&)> callback = {});
 
   // Remove an index entry corresponding to a file on disk
-  void remove_entry_by_path(const std::string &path);
+  void remove_entry_by_path(const std::string& path);
 
   // Remove all entries from the index under a given directory
-  void remove_entries_in_directory(const std::string &dir, stage stage);
+  void remove_entries_in_directory(const std::string& dir, stage stage);
 
   // Set index capabilities flags.
   void set_index_capabilities(capability caps);
@@ -290,9 +289,8 @@ public:
   // removed depending on working directory state). Return 0 to proceed with
   // updating the item, > 0 to skip the item, and < 0 to abort the scan.
   void update_entries_that_match(
-      const std::vector<std::string> &pathspec,
-      std::function<int(const std::string &, const std::string &)> callback =
-          {});
+      const std::vector<std::string>& pathspec,
+      std::function<int(const std::string&, const std::string&)> callback = {});
 
   // Get index on-disk version.
   // Valid return values are 2, 3, or 4. If 3 is returned, an index with version
@@ -309,28 +307,28 @@ public:
   oid write_tree();
 
   // Write the index as a tree to the given repository
-  oid write_tree_to(const class repository &repo);
+  oid write_tree_to(const class repository& repo);
 
   // Create a new bare Git index object as a memory
   // representation of the Git index file in 'index_path',
   // without a repository to back it.
-  static index open(const std::string &path);
+  static index open(const std::string& path);
 
   // Owner repository
   class repository owner() const;
 
   // Access libgit2 C ptr
-  const git_index *c_ptr() const;
+  const git_index* c_ptr() const;
 
-private:
+ private:
   friend class pathspec;
   friend class rebase;
   friend class repository;
-  git_index *c_ptr_;
+  git_index* c_ptr_;
   ownership owner_;
 };
 ENABLE_BITMASK_OPERATORS(index::entry::flag);
 ENABLE_BITMASK_OPERATORS(index::entry::extended_flag);
 ENABLE_BITMASK_OPERATORS(index::add_option);
 
-} // namespace cppgit2
+}  // namespace cppgit2

@@ -5,7 +5,7 @@ namespace cppgit2 {
 annotated_commit::annotated_commit()
     : c_ptr_(nullptr), owner_(ownership::libgit2) {}
 
-annotated_commit::annotated_commit(git_annotated_commit *c_ptr, ownership owner)
+annotated_commit::annotated_commit(git_annotated_commit* c_ptr, ownership owner)
     : c_ptr_(c_ptr), owner_(owner) {}
 
 annotated_commit::~annotated_commit() {
@@ -25,6 +25,8 @@ std::string annotated_commit::refname() const {
     return "";
 }
 
-const git_annotated_commit *annotated_commit::c_ptr() const { return c_ptr_; }
+const git_annotated_commit* annotated_commit::c_ptr() const {
+  return c_ptr_;
+}
 
-} // namespace cppgit2
+}  // namespace cppgit2

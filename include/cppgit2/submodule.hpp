@@ -1,4 +1,5 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/bitmask_operators.hpp>
 #include <cppgit2/checkout.hpp>
 #include <cppgit2/fetch.hpp>
@@ -6,19 +7,18 @@
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/oid.hpp>
 #include <cppgit2/ownership.hpp>
-#include <git2.h>
 #include <string>
 
 namespace cppgit2 {
 
 class submodule : public libgit2_api {
-public:
+ public:
   // Default construction
   submodule();
 
   // Construct from libgit2 C ptr
   // If owned by user, will be free'd in the destructor
-  submodule(git_submodule *c_ptr, ownership owner = ownership::libgit2);
+  submodule(git_submodule* c_ptr, ownership owner = ownership::libgit2);
 
   // Cleanup submodule ptr if owned by user
   ~submodule();
@@ -42,10 +42,10 @@ public:
   std::string branch_name() const;
 
   enum class recurse {
-    no = 0,  // do not recurse into submodules
-    yes = 1, // recurse into submodules
+    no = 0,   // do not recurse into submodules
+    yes = 1,  // recurse into submodules
     on_demand =
-        2 // recurse into submodules when commit not already in local clone
+        2  // recurse into submodules when commit not already in local clone
   };
 
   // Read the fetchRecurseSubmodules rule for a submodule.
@@ -55,11 +55,11 @@ public:
   oid head_id() const;
 
   enum class ignore {
-    unspecified = -1, // use the submodule's configuration
-    none = 1,         // any change or untracked == dirty
-    untracked = 2,    // dirty if tracked files change
-    dirty = 3,        // only dirty if HEAD moved
-    all = 4           // never dirty
+    unspecified = -1,  // use the submodule's configuration
+    none = 1,          // any change or untracked == dirty
+    untracked = 2,     // dirty if tracked files change
+    dirty = 3,         // only dirty if HEAD moved
+    all = 4            // never dirty
   };
 
   // Get the ignore rule that will be used for the submodule.
@@ -136,7 +136,7 @@ public:
   status location_status() const;
 
   class update_options : public libgit2_api {
-  public:
+   public:
     update_options() : c_ptr_(nullptr) {
       auto ret = git_submodule_update_init_options(
           &default_options_, GIT_SUBMODULE_UPDATE_OPTIONS_VERSION);
@@ -145,7 +145,7 @@ public:
         throw git_exception();
     }
 
-    update_options(git_submodule_update_options *c_ptr) : c_ptr_(c_ptr) {}
+    update_options(git_submodule_update_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -155,7 +155,7 @@ public:
     checkout::options checkout_options() const {
       return checkout::options(&c_ptr_->checkout_opts);
     }
-    void set_checkout_options(const checkout::options &options) {
+    void set_checkout_options(const checkout::options& options) {
       c_ptr_->checkout_opts = *(options.c_ptr());
     }
 
@@ -163,7 +163,7 @@ public:
     fetch::options fetch_options() const {
       return fetch::options(&c_ptr_->fetch_opts);
     }
-    void set_fetch_options(const fetch::options &options) {
+    void set_fetch_options(const fetch::options& options) {
       c_ptr_->fetch_opts = *(options.c_ptr());
     }
 
@@ -172,32 +172,32 @@ public:
     void set_allow_fetch(bool value) { c_ptr_->allow_fetch = value; }
 
     // Access libgit2 C ptr
-    const git_submodule_update_options *c_ptr() const { return c_ptr_; }
+    const git_submodule_update_options* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     friend submodule;
-    git_submodule_update_options *c_ptr_;
+    git_submodule_update_options* c_ptr_;
     git_submodule_update_options default_options_;
   };
 
   // Perform the clone step for a newly created submodule.
-  class repository clone(const update_options &options = update_options());
+  class repository clone(const update_options& options = update_options());
 
   // Update a submodule. This will clone a missing submodule and checkout the
   // subrepository to the commit specified in the index of the containing
   // repository. If the submodule repository doesn't contain the target commit
   // (e.g. because fetchRecurseSubmodules isn't set), then the submodule is
   // fetched using the fetch options supplied in options.
-  void update(bool init, const update_options &options = update_options());
+  void update(bool init, const update_options& options = update_options());
 
   // Access libgit2 C ptr
-  const git_submodule *c_ptr() const;
+  const git_submodule* c_ptr() const;
 
-private:
+ private:
   friend class repository;
-  git_submodule *c_ptr_;
+  git_submodule* c_ptr_;
   ownership owner_;
 };
 ENABLE_BITMASK_OPERATORS(submodule::status);
 
-} // namespace cppgit2
+}  // namespace cppgit2

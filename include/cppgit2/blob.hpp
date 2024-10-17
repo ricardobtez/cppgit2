@@ -11,13 +11,13 @@ using blob_size = git_off_t;
 // Always owned by user
 // Free'd in destructor
 class blob : public libgit2_api {
-public:
+ public:
   // Default construct a blob
   blob();
 
   // Construct a blob from libgit2 C ptr
   // Calls git_blob_dup to create a duplicate
-  blob(const git_blob *c_ptr);
+  blob(const git_blob* c_ptr);
 
   // Free blob with git_blob_free
   ~blob();
@@ -35,17 +35,17 @@ public:
   bool is_binary() const;
 
   // Get read-only buffer with raw contents of this blob
-  const void *raw_contents() const;
+  const void* raw_contents() const;
 
   // Get size in bytes of the contents of this blob
   blob_size raw_size() const;
 
   // Access libgit2 C ptr
-  const git_blob *c_ptr() const;
+  const git_blob* c_ptr() const;
 
-private:
+ private:
   friend class repository;
-  git_blob *c_ptr_;
+  git_blob* c_ptr_;
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

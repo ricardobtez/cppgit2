@@ -1,15 +1,15 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cstdlib>
 #include <cstring>
-#include <git2.h>
 #include <string>
 
 namespace cppgit2 {
 
 class data_buffer : public libgit2_api {
-public:
+ public:
   // Default construct a data buffer using GIT_BUF_INIT
   data_buffer();
 
@@ -18,7 +18,7 @@ public:
   data_buffer(size_t n);
 
   // Construct buffer from libgit2 C ptr
-  data_buffer(const git_buf *c_ptr);
+  data_buffer(const git_buf* c_ptr);
 
   // Dispose internal buffer
   ~data_buffer();
@@ -34,17 +34,17 @@ public:
   bool is_binary() const;
 
   // Set buffer to a copy of some raw data
-  void set_buffer(const std::string &buffer);
+  void set_buffer(const std::string& buffer);
 
   // Get string representation of data buffer
   std::string to_string() const;
 
   // Access libgit2 C ptr
-  git_buf *c_ptr();
-  const git_buf *c_ptr() const;
+  git_buf* c_ptr();
+  const git_buf* c_ptr() const;
 
-private:
+ private:
   git_buf c_struct_;
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

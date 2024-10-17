@@ -4,7 +4,7 @@ namespace cppgit2 {
 
 worktree::worktree() : c_ptr_(nullptr), owner_(ownership::libgit2) {}
 
-worktree::worktree(git_worktree *c_ptr, ownership owner)
+worktree::worktree(git_worktree* c_ptr, ownership owner)
     : c_ptr_(c_ptr), owner_(owner) {}
 
 worktree::~worktree() {
@@ -17,7 +17,7 @@ std::pair<bool, std::string> worktree::is_locked() const {
   auto ret = git_worktree_is_locked(result.c_ptr(), c_ptr_);
   if (ret > 0) {
     // Locked
-    if (result.c_ptr()->size) // size > 0 => reason available
+    if (result.c_ptr()->size)  // size > 0 => reason available
       return std::pair<bool, std::string>{true, result.to_string()};
     else
       return std::pair<bool, std::string>{true, ""};
@@ -60,8 +60,8 @@ bool worktree::is_prunable() const {
     throw git_exception();
 }
 
-void worktree::lock(const std::string &reason) {
-  const char *reason_c = reason.empty() ? nullptr : reason.c_str();
+void worktree::lock(const std::string& reason) {
+  const char* reason_c = reason.empty() ? nullptr : reason.c_str();
   if (git_worktree_lock(c_ptr_, reason_c))
     throw git_exception();
 }
@@ -108,7 +108,9 @@ void worktree::unlock() {
     throw git_exception();
 }
 
-bool worktree::is_valid() { return git_worktree_validate(c_ptr_) == 0; }
+bool worktree::is_valid() {
+  return git_worktree_validate(c_ptr_) == 0;
+}
 
 bool worktree::validate() {
   if (!is_valid())
@@ -116,6 +118,8 @@ bool worktree::validate() {
   return true;
 }
 
-const git_worktree *worktree::c_ptr() const { return c_ptr_; }
+const git_worktree* worktree::c_ptr() const {
+  return c_ptr_;
+}
 
-} // namespace cppgit2
+}  // namespace cppgit2

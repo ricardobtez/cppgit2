@@ -23,7 +23,7 @@ enum class sort {
   reverse = 1 << 2
 };
 
-} // namespace revision
+}  // namespace revision
 ENABLE_BITMASK_OPERATORS(revision::sort);
 
-} // namespace cppgit2
+}  // namespace cppgit2

@@ -1,20 +1,20 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/ownership.hpp>
-#include <git2.h>
 #include <string>
 
 namespace cppgit2 {
 
 class refdb : public libgit2_api {
-public:
+ public:
   // Default constructor
   // Initializes libgit2
   refdb() : owner_(ownership::libgit2), c_ptr_(nullptr) {}
 
   // Construct from C API
-  refdb(git_refdb *c_ptr, ownership owner = ownership::libgit2)
+  refdb(git_refdb* c_ptr, ownership owner = ownership::libgit2)
       : c_ptr_(c_ptr), owner_(owner) {}
 
   // Free if owned by user
@@ -31,10 +31,10 @@ public:
       throw git_exception();
   }
 
-private:
+ private:
   friend class repository;
   ownership owner_;
-  git_refdb *c_ptr_;
+  git_refdb* c_ptr_;
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

@@ -1,15 +1,15 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/proxy.hpp>
 #include <cppgit2/strarray.hpp>
-#include <git2.h>
 
 namespace cppgit2 {
 
 class push : public libgit2_api {
-public:
+ public:
   class options : public libgit2_api {
-  public:
+   public:
     options() {
       auto ret =
           git_push_init_options(&default_options_, GIT_PUSH_OPTIONS_VERSION);
@@ -18,7 +18,7 @@ public:
         throw git_exception();
     }
 
-    options(git_push_options *c_ptr) : c_ptr_(c_ptr) {}
+    options(git_push_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -40,7 +40,7 @@ public:
     proxy::options proxy_options() const {
       return proxy::options(&c_ptr_->proxy_opts);
     }
-    void set_proxy_options(const proxy::options &options) {
+    void set_proxy_options(const proxy::options& options) {
       c_ptr_->proxy_opts = *(options.c_ptr());
     }
 
@@ -48,18 +48,18 @@ public:
     strarray custom_headers() const {
       return strarray(&c_ptr_->custom_headers);
     }
-    void set_custom_headers(const strarray &headers) {
+    void set_custom_headers(const strarray& headers) {
       c_ptr_->custom_headers = *(headers.c_ptr());
     }
 
     // Access libgit2 C ptr
-    const git_push_options *c_ptr() const { return c_ptr_; }
+    const git_push_options* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     friend push;
-    git_push_options *c_ptr_;
+    git_push_options* c_ptr_;
     git_push_options default_options_;
   };
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

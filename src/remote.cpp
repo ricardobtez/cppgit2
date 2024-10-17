@@ -3,7 +3,7 @@ using namespace cppgit2;
 
 remote::remote() : c_ptr_(nullptr), owner_(ownership::libgit2) {}
 
-remote::remote(git_remote *c_ptr, ownership owner)
+remote::remote(git_remote* c_ptr, ownership owner)
     : c_ptr_(c_ptr), owner_(owner) {}
 
 remote::~remote() {
@@ -15,12 +15,14 @@ fetch::options::autotag remote::autotag_option() {
   return static_cast<fetch::options::autotag>(git_remote_autotag(c_ptr_));
 }
 
-bool remote::is_connected() const { return git_remote_connected(c_ptr_); }
+bool remote::is_connected() const {
+  return git_remote_connected(c_ptr_);
+}
 
 void remote::connect(connection_direction direction,
-                     const callbacks &remote_callbacks,
-                     const proxy::options &proxy_options,
-                     const strarray &custom_headers) {
+                     const callbacks& remote_callbacks,
+                     const proxy::options& proxy_options,
+                     const strarray& custom_headers) {
   if (git_remote_connect(c_ptr_, static_cast<git_direction>(direction),
                          remote_callbacks.c_ptr(), proxy_options.c_ptr(),
                          custom_headers.c_ptr()))
@@ -31,7 +33,7 @@ cppgit2::repository remote::create_options::repository() const {
   return cppgit2::repository(c_ptr_->repository);
 }
 
-void remote::create_options::set_repository(const cppgit2::repository &repo) {
+void remote::create_options::set_repository(const cppgit2::repository& repo) {
   c_ptr_->repository = repo.c_ptr_;
 }
 
@@ -42,15 +44,15 @@ remote remote::copy() const {
   return result;
 }
 
-remote remote::create_detached_remote(const std::string &url) {
+remote remote::create_detached_remote(const std::string& url) {
   remote result(nullptr, ownership::user);
   if (git_remote_create_detached(&result.c_ptr_, url.c_str()))
     throw git_exception();
   return result;
 }
 
-remote remote::create_remote(const std::string &url,
-                             const create_options &options) {
+remote remote::create_remote(const std::string& url,
+                             const create_options& options) {
   remote result(nullptr, ownership::user);
   if (git_remote_create_with_opts(&result.c_ptr_, url.c_str(), options.c_ptr()))
     throw git_exception();
@@ -69,14 +71,13 @@ void remote::disconnect() {
     throw git_exception();
 }
 
-void remote::download(const strarray &refspecs, const fetch::options &options) {
+void remote::download(const strarray& refspecs, const fetch::options& options) {
   if (git_remote_download(c_ptr_, refspecs.c_ptr(), options.c_ptr()))
     throw git_exception();
 }
 
-void remote::fetch_(const strarray &refspecs,
-                        const std::string &reflog_message,
-                        const fetch::options &options) {
+void remote::fetch_(const strarray& refspecs, const std::string& reflog_message,
+                    const fetch::options& options) {
   if (git_remote_fetch(c_ptr_, refspecs.c_ptr(), options.c_ptr(),
                        reflog_message.c_str()))
     throw git_exception();
@@ -96,13 +97,13 @@ strarray remote::push_refspec() const {
   return result;
 }
 
-bool remote::is_valid_name(const std::string &name) {
+bool remote::is_valid_name(const std::string& name) {
   return git_remote_is_valid_name(name.c_str());
 }
 
 std::vector<remote::head> remote::reference_advertisement_list() {
-  const git_remote_head *head_ptr = nullptr;
-  const git_remote_head **head_ptr_ptr = &head_ptr;
+  const git_remote_head* head_ptr = nullptr;
+  const git_remote_head** head_ptr_ptr = &head_ptr;
   size_t size = 0;
   if (git_remote_ls(&head_ptr_ptr, &size, c_ptr_))
     throw git_exception();
@@ -122,7 +123,7 @@ repository remote::owner() const {
   return repository(git_remote_owner(c_ptr_));
 }
 
-void remote::prune(const callbacks &remote_callbacks) {
+void remote::prune(const callbacks& remote_callbacks) {
   if (git_remote_prune(c_ptr_, remote_callbacks.c_ptr()))
     throw git_exception();
 }
@@ -132,7 +133,7 @@ void remote::prune_references() {
     throw git_exception();
 }
 
-void remote::push(const strarray &refspecs, const push::options &options) {
+void remote::push(const strarray& refspecs, const push::options& options) {
   if (git_remote_push(c_ptr_, refspecs.c_ptr(), options.c_ptr()))
     throw git_exception();
 }
@@ -142,10 +143,12 @@ std::string remote::push_url() const {
   return ret ? std::string(ret) : "";
 }
 
-size_t remote::size() const { return git_remote_refspec_count(c_ptr_); }
+size_t remote::size() const {
+  return git_remote_refspec_count(c_ptr_);
+}
 
 refspec remote::operator[](size_t n) {
-  return refspec((git_refspec *)git_remote_get_refspec(c_ptr_, n));
+  return refspec((git_refspec*)git_remote_get_refspec(c_ptr_, n));
 }
 
 indexer::progress remote::stats() const {
@@ -157,10 +160,10 @@ void remote::stop() {
     throw git_exception();
 }
 
-void remote::update_tips(const callbacks &remote_callbacks,
+void remote::update_tips(const callbacks& remote_callbacks,
                          bool update_fetchhead,
                          fetch::options::autotag download_tags,
-                         const std::string &reflog_message) {
+                         const std::string& reflog_message) {
   if (git_remote_update_tips(
           c_ptr_, remote_callbacks.c_ptr(), update_fetchhead,
           static_cast<git_remote_autotag_option_t>(download_tags),
@@ -168,7 +171,7 @@ void remote::update_tips(const callbacks &remote_callbacks,
     throw git_exception();
 }
 
-void remote::upload(const strarray &refspecs, const push::options &options) {
+void remote::upload(const strarray& refspecs, const push::options& options) {
   if (git_remote_upload(c_ptr_, refspecs.c_ptr(), options.c_ptr()))
     throw git_exception();
 }
