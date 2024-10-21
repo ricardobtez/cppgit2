@@ -1,4 +1,5 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/bitmask_operators.hpp>
 #include <cppgit2/connection_direction.hpp>
 #include <cppgit2/data_buffer.hpp>
@@ -9,18 +10,17 @@
 #include <cppgit2/push.hpp>
 #include <cppgit2/refspec.hpp>
 #include <cppgit2/strarray.hpp>
-#include <git2.h>
 #include <string>
 
 namespace cppgit2 {
 
 class remote : public libgit2_api {
-public:
+ public:
   // Default construct a remote object
   remote();
 
   // Construct from libgit2 C ptr
-  remote(git_remote *c_ptr, ownership owner = ownership::libgit2);
+  remote(git_remote* c_ptr, ownership owner = ownership::libgit2);
 
   // Cleanup remote object
   ~remote();
@@ -33,7 +33,7 @@ public:
   bool is_connected() const;
 
   class callbacks : public libgit2_api {
-  public:
+   public:
     callbacks() : c_ptr_(nullptr) {
       auto ret = git_remote_init_callbacks(&default_options_,
                                            GIT_REMOTE_CALLBACKS_VERSION);
@@ -42,13 +42,13 @@ public:
         throw git_exception();
     }
 
-    callbacks(git_remote_callbacks *c_ptr) : c_ptr_(c_ptr) {}
+    callbacks(git_remote_callbacks* c_ptr) : c_ptr_(c_ptr) {}
 
     // Access libgit2 C ptr
-    const git_remote_callbacks *c_ptr() const { return c_ptr_; }
+    const git_remote_callbacks* c_ptr() const { return c_ptr_; }
 
-  private:
-    git_remote_callbacks *c_ptr_;
+   private:
+    git_remote_callbacks* c_ptr_;
     git_remote_callbacks default_options_;
   };
 
@@ -57,9 +57,9 @@ public:
   // to a limitation of the git protocol (over TCP or SSH) which starts up a
   // specific binary which can only do the one or the other.
   void connect(connection_direction direction,
-               const callbacks &remote_callbacks = callbacks(),
-               const proxy::options &proxy_options = proxy::options(),
-               const strarray &custom_headers = strarray(nullptr));
+               const callbacks& remote_callbacks = callbacks(),
+               const proxy::options& proxy_options = proxy::options(),
+               const strarray& custom_headers = strarray(nullptr));
 
   // Remote creation options flags
   enum class create_flag {
@@ -70,7 +70,7 @@ public:
   };
 
   class create_options : public libgit2_api {
-  public:
+   public:
     create_options() : c_ptr_(nullptr) {
       auto ret = git_remote_create_init_options(
           &default_options_, GIT_REMOTE_CREATE_OPTIONS_VERSION);
@@ -79,7 +79,7 @@ public:
         throw git_exception();
     }
 
-    create_options(git_remote_create_options *c_ptr) : c_ptr_(c_ptr) {}
+    create_options(git_remote_create_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -87,19 +87,19 @@ public:
 
     // Repository
     class repository repository() const;
-    void set_repository(const class repository &repo);
+    void set_repository(const class repository& repo);
 
     // Name
     std::string name() const {
       return c_ptr_->name ? std::string(c_ptr_->name) : "";
     }
-    void set_name(const std::string &name) { c_ptr_->name = name.c_str(); }
+    void set_name(const std::string& name) { c_ptr_->name = name.c_str(); }
 
     // Fetchspec
     std::string fetchspec() const {
       return c_ptr_->fetchspec ? std::string(c_ptr_->fetchspec) : "";
     }
-    void set_fetchspec(const std::string &fetchspec) {
+    void set_fetchspec(const std::string& fetchspec) {
       c_ptr_->fetchspec = fetchspec.c_str();
     }
 
@@ -107,15 +107,15 @@ public:
     create_flag flags() const {
       return static_cast<create_flag>(c_ptr_->flags);
     }
-    void set_flags(const create_flag &flags) {
+    void set_flags(const create_flag& flags) {
       c_ptr_->flags = static_cast<unsigned int>(flags);
     }
 
     // Access libgit2 C ptr
-    const git_remote_create_options *c_ptr() const { return c_ptr_; }
+    const git_remote_create_options* c_ptr() const { return c_ptr_; }
 
-  private:
-    git_remote_create_options *c_ptr_;
+   private:
+    git_remote_create_options* c_ptr_;
     git_remote_create_options default_options_;
   };
 
@@ -130,12 +130,12 @@ public:
   // Contrasted with repository::create_anonymous_remote,
   // a detached remote will not consider any repo configuration
   // values (such as instead of url substitutions).
-  static remote create_detached_remote(const std::string &url);
+  static remote create_detached_remote(const std::string& url);
 
   // Create a remote, with options.
   // This function allows more fine-grained control over the remote creation.
-  static remote create_remote(const std::string &url,
-                              const create_options &options = create_options());
+  static remote create_remote(const std::string& url,
+                              const create_options& options = create_options());
 
   // Retrieve the name of the remote's default branch
   // This function must only be called after connecting.
@@ -145,13 +145,13 @@ public:
   void disconnect();
 
   // Download and index the packfile
-  void download(const strarray &refspecs,
-                const fetch::options &options = fetch::options());
+  void download(const strarray& refspecs,
+                const fetch::options& options = fetch::options());
 
   // Download new data and update tips
   void fetch_(
-      const strarray &refspecs, const std::string &reflog_message,
-      const cppgit2::fetch::options &options = cppgit2::fetch::options());
+      const strarray& refspecs, const std::string& reflog_message,
+      const cppgit2::fetch::options& options = cppgit2::fetch::options());
 
   // Get the remote's list of fetch refspecs
   // The memory is owned by the user and should be freed
@@ -160,8 +160,8 @@ public:
   // Description of a reference advertised by a remote server, given out on `ls`
   // calls.
   class head : public libgit2_api {
-  public:
-    head(const git_remote_head *c_ptr) : c_struct_(*c_ptr) {}
+   public:
+    head(const git_remote_head* c_ptr) : c_struct_(*c_ptr) {}
 
     bool local() const { return c_struct_.local; }
 
@@ -180,12 +180,12 @@ public:
                                      : "";
     }
 
-  private:
+   private:
     git_remote_head c_struct_;
   };
 
   // Ensure the remote name is well-formed.
-  static bool is_valid_name(const std::string &name);
+  static bool is_valid_name(const std::string& name);
 
   // Get the remote repository's reference advertisement list
   std::vector<head> reference_advertisement_list();
@@ -197,14 +197,14 @@ public:
   class repository owner() const;
 
   // Prune tracking refs that are no longer present on remote
-  void prune(const callbacks &remote_callbacks = callbacks());
+  void prune(const callbacks& remote_callbacks = callbacks());
 
   // Retrieve the ref-prune setting
   void prune_references();
 
   // Peform all the steps from a push.
-  void push(const strarray &refspecs,
-            const push::options &options = push::options());
+  void push(const strarray& refspecs,
+            const push::options& options = push::options());
 
   // Get the remote's list of push refspecs
   // The memory is owned by the user and should be freed
@@ -230,26 +230,26 @@ public:
   void stop();
 
   // Update the tips to the new state
-  void update_tips(const callbacks &remote_callbacks, bool update_fetchhead,
+  void update_tips(const callbacks& remote_callbacks, bool update_fetchhead,
                    cppgit2::fetch::options::autotag download_tags,
-                   const std::string &reflog_message);
+                   const std::string& reflog_message);
 
   // Create a packfile and send it to the server
   //
   // Connect to the remote if it hasn't been done yet,
   // negotiate with the remote git which objects are missing,
   // create a packfile with the missing objects and send it.
-  void upload(const strarray &refspecs,
-              const push::options &options = push::options());
+  void upload(const strarray& refspecs,
+              const push::options& options = push::options());
 
   // Get the remote's url
   std::string url() const;
 
-private:
+ private:
   friend class repository;
   ownership owner_;
-  git_remote *c_ptr_;
+  git_remote* c_ptr_;
 };
 ENABLE_BITMASK_OPERATORS(remote::create_flag);
 
-} // namespace cppgit2
+}  // namespace cppgit2

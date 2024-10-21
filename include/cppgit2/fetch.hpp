@@ -1,17 +1,17 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/proxy.hpp>
 #include <cppgit2/strarray.hpp>
-#include <git2.h>
 #include <string>
 #include <vector>
 
 namespace cppgit2 {
 
 class fetch : public libgit2_api {
-public:
+ public:
   class options : public libgit2_api {
-  public:
+   public:
     options() : c_ptr_(nullptr) {
       auto ret =
           git_fetch_init_options(&default_options_, GIT_FETCH_OPTIONS_VERSION);
@@ -20,7 +20,7 @@ public:
         throw git_exception();
     }
 
-    options(git_fetch_options *c_ptr) : c_ptr_(c_ptr) {}
+    options(git_fetch_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -83,7 +83,7 @@ public:
     proxy::options proxy_options() const {
       return proxy::options(&c_ptr_->proxy_opts);
     }
-    void set_proxy_options(const proxy::options &options) {
+    void set_proxy_options(const proxy::options& options) {
       c_ptr_->proxy_opts = *(options.c_ptr());
     }
 
@@ -91,17 +91,17 @@ public:
     strarray custom_headers() const {
       return strarray(&c_ptr_->custom_headers);
     }
-    void set_custom_headers(const std::vector<std::string> &headers) {
+    void set_custom_headers(const std::vector<std::string>& headers) {
       c_ptr_->custom_headers = *(strarray(headers).c_ptr());
     }
 
     // Access libgit2 C ptr
-    const git_fetch_options *c_ptr() const { return c_ptr_; }
+    const git_fetch_options* c_ptr() const { return c_ptr_; }
 
-  private:
-    git_fetch_options *c_ptr_;
+   private:
+    git_fetch_options* c_ptr_;
     git_fetch_options default_options_;
   };
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

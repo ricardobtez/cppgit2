@@ -1,38 +1,38 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/bitmask_operators.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/ownership.hpp>
-#include <git2.h>
 #include <string>
 
 namespace cppgit2 {
 
 // Owned by user, cleaned up in destructor
 class credential : public libgit2_api {
-public:
+ public:
   // Create a "default" credential usable for Negotiate mechanisms like NTLM or
   // Kerberos authentication.
   credential();
 
   // Create a new plain-text username and password credential object. The
   // supplied credential parameter will be internally duplicated.
-  credential(const std::string &username, const std::string &password);
+  credential(const std::string& username, const std::string& password);
 
   // Create a new passphrase-protected ssh key credential object. The supplied
   // credential parameter will be internally duplicated.
-  credential(const std::string &username, const std::string &public_key,
-             const std::string &private_key, const std::string &passphrase);
+  credential(const std::string& username, const std::string& public_key,
+             const std::string& private_key, const std::string& passphrase);
 
   // Create a new ssh key credential object used for querying an ssh-agent. The
   // supplied credential parameter will be internally duplicated.
-  credential(const std::string &username);
+  credential(const std::string& username);
 
   // Create a new ssh keyboard-interactive based credential object. The supplied
   // credential parameter will be internally duplicated.
   //
   // Not much wrapping happening here - More or less same signature as libgit2
-  credential(const std::string &username,
-             git_credential_ssh_interactive_cb prompt_callback, void *payload);
+  credential(const std::string& username,
+             git_credential_ssh_interactive_cb prompt_callback, void* payload);
 
   // Create an ssh key credential with a custom signing function.
   //
@@ -41,8 +41,8 @@ public:
   // wraps libssh2_userauth_publickey(), which is undocumented.
   //
   // Not much wrapping happening here - More or less same signature as libgit2
-  credential(const std::string &username, const std::string &public_key,
-             git_credential_sign_cb sign_callback, void *payload);
+  credential(const std::string& username, const std::string& public_key,
+             git_credential_sign_cb sign_callback, void* payload);
 
   // Cleanup credential object
   ~credential();
@@ -88,11 +88,11 @@ public:
   bool has_username() const;
 
   // Access libgit2 C ptr
-  const git_credential *c_ptr() const;
+  const git_credential* c_ptr() const;
 
-private:
-  git_credential *c_ptr_;
+ private:
+  git_credential* c_ptr_;
 };
 ENABLE_BITMASK_OPERATORS(credential::type);
 
-} // namespace cppgit2
+}  // namespace cppgit2

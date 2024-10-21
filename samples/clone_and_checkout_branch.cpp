@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace cppgit2;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   if (argc == 4) {
     clone::options options;
     options.set_checkout_branch_name(argv[3]);

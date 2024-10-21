@@ -18,7 +18,7 @@ TEST_CASE("Invalid oid construction" * test_suite("oid")) {
   bool exception_thrown = false;
   try {
     oid foo("f9de90000&^$%_%#");
-  } catch (git_exception &) {
+  } catch (git_exception&) {
     exception_thrown = true;
   }
   REQUIRE(exception_thrown);
@@ -92,9 +92,9 @@ TEST_CASE("Interoperatbility with libgit2" * test_suite("oid")) {
 
   // Use the libgit2 C API to format
   size_t n = 8;
-  char *oid1_formatted = (char *)malloc(sizeof(char) * n);
+  char* oid1_formatted = (char*)malloc(sizeof(char) * n);
   git_oid_tostr(oid1_formatted, n + 1, oid1_cptr);
 
   // Results are the same
-  REQUIRE(oid1.to_hex_string(8) == std::string(oid1_formatted)); // f9de917
+  REQUIRE(oid1.to_hex_string(8) == std::string(oid1_formatted));  // f9de917
 }

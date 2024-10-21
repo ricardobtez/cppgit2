@@ -1,34 +1,34 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/bitmask_operators.hpp>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/object.hpp>
 #include <cppgit2/ownership.hpp>
-#include <git2.h>
 #include <string>
 
 namespace cppgit2 {
 
 class reference : public libgit2_api {
-public:
+ public:
   reference();
-  reference(git_reference *c_ptr, ownership owner = ownership::libgit2);
+  reference(git_reference* c_ptr, ownership owner = ownership::libgit2);
   ~reference();
 
   // Basic type of any Git reference
   enum class reference_type {
-    invalid = 0,  // Invalid reference
-    direct = 1,   // A reference that points at an object id
-    symbolic = 2, // A reference that points at another reference
+    invalid = 0,   // Invalid reference
+    direct = 1,    // A reference that points at an object id
+    symbolic = 2,  // A reference that points at another reference
     all = direct | symbolic
   };
 
   // Compare two references.
   // 0 if the same, else a stable but meaningless ordering.
-  int compare(const reference &rhs) const;
+  int compare(const reference& rhs) const;
 
   // Delete an existing reference.
-  static void delete_reference(reference &ref);
+  static void delete_reference(reference& ref);
 
   // Create a duplicate of an existing reference
   reference copy() const;
@@ -48,7 +48,7 @@ public:
   //    anything. You must avoid the characters '~', '^', ':', '\', '?', '[',
   //    and '*', and the sequences ".." and "@{" which have special meaning to
   //    revparse.
-  static bool is_valid_name(const std::string &refname);
+  static bool is_valid_name(const std::string& refname);
 
   // Full name of this reference
   std::string name() const;
@@ -65,7 +65,7 @@ public:
   // This will normalize the reference name by removing any leading
   // slash '/' characters and collapsing runs of adjacent
   // slashes between name components into a single slash.
-  static std::string normalize_name(size_t length, const std::string &name,
+  static std::string normalize_name(size_t length, const std::string& name,
                                     reference::format flags);
 
   // This will transform the reference name into a name "human-readable"
@@ -83,8 +83,8 @@ public:
   // IMPORTANT: The user needs to write a proper reflog entry
   // if the reflog is enabled for the repository. We only rename the reflog if
   // it exists.
-  reference rename(const std::string &new_name, bool force,
-                   const std::string &log_message);
+  reference rename(const std::string& new_name, bool force,
+                   const std::string& log_message);
 
   // Resolve a sym reference to a direct reference
   // If a direct reference is passed as an argument, a copy of that reference is
@@ -94,13 +94,13 @@ public:
   // Conditionally create a new reference with the same name as
   // the given reference but a different OID target.
   // The reference must be a direct reference, otherwise this will fail.
-  reference set_target(const oid &id, const std::string &log_message);
+  reference set_target(const oid& id, const std::string& log_message);
 
   // Create a new reference with the same name as the given reference
   // but a different symbolic target.
   // The reference must be a symbolic reference, otherwise this will fail.
-  reference set_symbolic_target(const std::string &target,
-                                const std::string &log_message);
+  reference set_symbolic_target(const std::string& target,
+                                const std::string& log_message);
 
   // Get the OID pointed by a direct reference
   // Only available if the reference is direct (i.e. an object id reference, not
@@ -121,13 +121,13 @@ public:
   reference_type type() const;
 
   // Access libgit2 C ptr
-  const git_reference *c_ptr() const;
+  const git_reference* c_ptr() const;
 
-private:
+ private:
   friend class repository;
-  git_reference *c_ptr_;
+  git_reference* c_ptr_;
   ownership owner_;
 };
 ENABLE_BITMASK_OPERATORS(reference::format);
 
-} // namespace cppgit2
+}  // namespace cppgit2

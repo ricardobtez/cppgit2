@@ -6,7 +6,7 @@ revwalk::revwalk()
     : done_(false), c_ptr_(nullptr), owner_(ownership::libgit2) {}
 
 // Construct from libgit2 C ptr
-revwalk::revwalk(git_revwalk *c_ptr, ownership owner)
+revwalk::revwalk(git_revwalk* c_ptr, ownership owner)
     : done_(false), c_ptr_(c_ptr), owner_(owner) {}
 
 // Cleanup revwalk
@@ -15,31 +15,33 @@ revwalk::~revwalk() {
     git_revwalk_free(c_ptr_);
 }
 
-void revwalk::add_hide_callback(std::function<int(const oid &)> callback) {
+void revwalk::add_hide_callback(std::function<int(const oid&)> callback) {
   struct visitor_wrapper {
-    std::function<int(const oid &)> fn;
+    std::function<int(const oid&)> fn;
   };
 
   visitor_wrapper wrapper;
   wrapper.fn = callback;
 
-  auto callback_c = [](const git_oid *commit_id, void *payload) {
-    auto wrapper = reinterpret_cast<visitor_wrapper *>(payload);
+  auto callback_c = [](const git_oid* commit_id, void* payload) {
+    auto wrapper = reinterpret_cast<visitor_wrapper*>(payload);
     return wrapper->fn(oid(commit_id));
   };
 
-  if (git_revwalk_add_hide_cb(c_ptr_, callback_c, (void *)(&wrapper)))
+  if (git_revwalk_add_hide_cb(c_ptr_, callback_c, (void*)(&wrapper)))
     throw git_exception();
 }
 
-bool revwalk::done() const { return done_; }
+bool revwalk::done() const {
+  return done_;
+}
 
-void revwalk::hide(const oid &commit_id) {
+void revwalk::hide(const oid& commit_id) {
   if (git_revwalk_hide(c_ptr_, commit_id.c_ptr()))
     throw git_exception();
 }
 
-void revwalk::hide_glob(const std::string &glob) {
+void revwalk::hide_glob(const std::string& glob) {
   if (git_revwalk_hide_glob(c_ptr_, glob.c_str()))
     throw git_exception();
 }
@@ -49,7 +51,7 @@ void revwalk::hide_head() {
     throw git_exception();
 }
 
-void revwalk::hide_reference(const std::string &ref) {
+void revwalk::hide_reference(const std::string& ref) {
   if (git_revwalk_hide_ref(c_ptr_, ref.c_str()))
     throw git_exception();
 }
@@ -61,12 +63,12 @@ oid revwalk::next() {
   return result;
 }
 
-void revwalk::push(const oid &id) {
+void revwalk::push(const oid& id) {
   if (git_revwalk_push(c_ptr_, id.c_ptr()))
     throw git_exception();
 }
 
-void revwalk::push_glob(const std::string &glob) {
+void revwalk::push_glob(const std::string& glob) {
   if (git_revwalk_push_glob(c_ptr_, glob.c_str()))
     throw git_exception();
 }
@@ -76,12 +78,12 @@ void revwalk::push_head() {
     throw git_exception();
 }
 
-void revwalk::push_range(const std::string &range) {
+void revwalk::push_range(const std::string& range) {
   if (git_revwalk_push_range(c_ptr_, range.c_str()))
     throw git_exception();
 }
 
-void revwalk::push_reference(const std::string &ref) {
+void revwalk::push_reference(const std::string& ref) {
   if (git_revwalk_push_ref(c_ptr_, ref.c_str()))
     throw git_exception();
 }
@@ -106,4 +108,6 @@ void revwalk::simplify_first_parent() {
     throw git_exception();
 }
 
-const git_revwalk *revwalk::c_ptr() const { return c_ptr_; }
+const git_revwalk* revwalk::c_ptr() const {
+  return c_ptr_;
+}

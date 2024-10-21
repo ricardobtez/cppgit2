@@ -1,15 +1,15 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/bitmask_operators.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/ownership.hpp>
 #include <cppgit2/strarray.hpp>
 #include <cppgit2/tree.hpp>
-#include <git2.h>
 
 namespace cppgit2 {
 
 class status : public libgit2_api {
-public:
+ public:
   // Status flags for a single file.
   //
   // The `index_` set of flags
@@ -41,7 +41,7 @@ public:
   enum class show { index_and_workdir = 0, index_only = 1, workdir_only = 2 };
 
   class options : public libgit2_api {
-  public:
+   public:
     options() {
       auto ret = git_status_init_options(&default_options_,
                                          GIT_STATUS_OPTIONS_VERSION);
@@ -50,7 +50,7 @@ public:
         throw git_exception();
     }
 
-    options(git_status_options *c_ptr) : c_ptr_(c_ptr) {}
+    options(git_status_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -91,38 +91,38 @@ public:
 
     // Pathspec
     strarray pathspec() const { return strarray(&c_ptr_->pathspec); }
-    void set_pathspec(const strarray &value) {
+    void set_pathspec(const strarray& value) {
       c_ptr_->pathspec = *(value.c_ptr());
     }
 
     // Baseline tree
     tree baseline() const { return tree(c_ptr_->baseline); }
-    void set_baseline(const tree &baseline_tree) {
-      c_ptr_->baseline = const_cast<git_tree *>(baseline_tree.c_ptr());
+    void set_baseline(const tree& baseline_tree) {
+      c_ptr_->baseline = const_cast<git_tree*>(baseline_tree.c_ptr());
     }
 
     // Access libgit2 C ptr
-    const git_status_options *c_ptr() const { return c_ptr_; }
+    const git_status_options* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     friend status;
-    git_status_options *c_ptr_;
+    git_status_options* c_ptr_;
     git_status_options default_options_;
   };
 
   class entry : public libgit2_api {
-  public:
-    entry(const git_status_entry *c_ptr) : c_ptr_(c_ptr) {}
+   public:
+    entry(const git_status_entry* c_ptr) : c_ptr_(c_ptr) {}
 
-  private:
-    const git_status_entry *c_ptr_;
+   private:
+    const git_status_entry* c_ptr_;
   };
 
   class list : public libgit2_api {
-  public:
+   public:
     list() : c_ptr_(nullptr), owner_(ownership::libgit2) {}
 
-    list(git_status_list *c_ptr, ownership owner = ownership::libgit2)
+    list(git_status_list* c_ptr, ownership owner = ownership::libgit2)
         : c_ptr_(c_ptr), owner_(owner) {}
 
     ~list() {
@@ -139,16 +139,16 @@ public:
     // Gets the count of status entries in this list.
     size_t size() const { return git_status_list_entrycount(c_ptr_); }
 
-  private:
+   private:
     friend class status;
     friend class repository;
     ownership owner_;
-    git_status_list *c_ptr_;
+    git_status_list* c_ptr_;
   };
 
-private:
+ private:
 };
 ENABLE_BITMASK_OPERATORS(status::status_type);
 ENABLE_BITMASK_OPERATORS(status::options::flag);
 
-} // namespace cppgit2
+}  // namespace cppgit2

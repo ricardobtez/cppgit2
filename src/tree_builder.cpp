@@ -3,7 +3,7 @@
 
 namespace cppgit2 {
 
-tree_builder::tree_builder(repository &repo, tree source) {
+tree_builder::tree_builder(repository& repo, tree source) {
   if (git_treebuilder_new(&c_ptr_, repo.c_ptr_, source.c_ptr()))
     throw git_exception();
 }
@@ -13,43 +13,47 @@ tree_builder::~tree_builder() {
     git_treebuilder_free(c_ptr_);
 }
 
-void tree_builder::clear() { git_treebuilder_clear(c_ptr_); }
+void tree_builder::clear() {
+  git_treebuilder_clear(c_ptr_);
+}
 
-void tree_builder::filter(std::function<int(const tree::entry &)> visitor) {
+void tree_builder::filter(std::function<int(const tree::entry&)> visitor) {
   // Wrap user-provided visitor funciton in a struct
   struct visitor_wrapper {
-    std::function<int(const tree::entry &)> fn;
+    std::function<int(const tree::entry&)> fn;
   };
 
   visitor_wrapper wrapper;
   wrapper.fn = visitor;
 
-  auto visitor_c = [](const git_tree_entry *entry, void *payload) {
-    auto wrapped = reinterpret_cast<visitor_wrapper *>(payload);
+  auto visitor_c = [](const git_tree_entry* entry, void* payload) {
+    auto wrapped = reinterpret_cast<visitor_wrapper*>(payload);
     const tree::entry entry_arg = tree::entry(entry);
     return wrapped->fn(entry_arg);
   };
 
-  git_treebuilder_filter(c_ptr_, visitor_c, (void *)(&wrapper));
+  git_treebuilder_filter(c_ptr_, visitor_c, (void*)(&wrapper));
 }
 
-size_t tree_builder::size() const { return git_treebuilder_entrycount(c_ptr_); }
+size_t tree_builder::size() const {
+  return git_treebuilder_entrycount(c_ptr_);
+}
 
-tree::entry tree_builder::operator[](const std::string &filename) const {
-  return tree::entry(const_cast<git_tree_entry *>(
+tree::entry tree_builder::operator[](const std::string& filename) const {
+  return tree::entry(const_cast<git_tree_entry*>(
                          git_treebuilder_get(c_ptr_, filename.c_str())),
                      ownership::libgit2);
 }
 
-void tree_builder::insert(const std::string &filename, const oid &id,
+void tree_builder::insert(const std::string& filename, const oid& id,
                           file_mode mode) {
-  const git_tree_entry *result = nullptr;
+  const git_tree_entry* result = nullptr;
   if (git_treebuilder_insert(&result, c_ptr_, filename.c_str(), id.c_ptr(),
                              static_cast<git_filemode_t>(mode)))
     throw git_exception();
 }
 
-void tree_builder::remove(const std::string &filename) {
+void tree_builder::remove(const std::string& filename) {
   if (git_treebuilder_remove(c_ptr_, filename.c_str()))
     throw git_exception();
 }
@@ -61,13 +65,15 @@ oid tree_builder::write() {
   return oid(&id);
 }
 
-oid tree_builder::write(data_buffer &tree) {
+oid tree_builder::write(data_buffer& tree) {
   git_oid id;
   if (git_treebuilder_write_with_buffer(&id, c_ptr_, tree.c_ptr()))
     throw git_exception();
   return oid(&id);
 }
 
-const git_treebuilder *tree_builder::c_ptr() const { return c_ptr_; }
+const git_treebuilder* tree_builder::c_ptr() const {
+  return c_ptr_;
+}
 
-} // namespace cppgit2
+}  // namespace cppgit2

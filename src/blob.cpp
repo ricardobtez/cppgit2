@@ -4,8 +4,8 @@ namespace cppgit2 {
 
 blob::blob() : c_ptr_(nullptr) {}
 
-blob::blob(const git_blob *c_ptr) {
-  if (git_blob_dup(&c_ptr_, const_cast<git_blob *>(c_ptr)))
+blob::blob(const git_blob* c_ptr) {
+  if (git_blob_dup(&c_ptr_, const_cast<git_blob*>(c_ptr)))
     throw git_exception();
 }
 
@@ -14,7 +14,9 @@ blob::~blob() {
     git_blob_free(c_ptr_);
 }
 
-repository blob::owner() const { return repository(git_blob_owner(c_ptr_)); }
+repository blob::owner() const {
+  return repository(git_blob_owner(c_ptr_));
+}
 
 blob blob::copy() const {
   blob result;
@@ -23,14 +25,24 @@ blob blob::copy() const {
   return result;
 }
 
-oid blob::id() const { return oid(git_blob_id(c_ptr_)); }
+oid blob::id() const {
+  return oid(git_blob_id(c_ptr_));
+}
 
-bool blob::is_binary() const { return git_blob_is_binary(c_ptr_); }
+bool blob::is_binary() const {
+  return git_blob_is_binary(c_ptr_);
+}
 
-const void *blob::raw_contents() const { return git_blob_rawcontent(c_ptr_); }
+const void* blob::raw_contents() const {
+  return git_blob_rawcontent(c_ptr_);
+}
 
-blob_size blob::raw_size() const { return git_blob_rawsize(c_ptr_); }
+blob_size blob::raw_size() const {
+  return git_blob_rawsize(c_ptr_);
+}
 
-const git_blob *blob::c_ptr() const { return c_ptr_; }
+const git_blob* blob::c_ptr() const {
+  return c_ptr_;
+}
 
-} // namespace cppgit2
+}  // namespace cppgit2

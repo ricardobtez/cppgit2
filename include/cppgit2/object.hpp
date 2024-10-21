@@ -1,19 +1,19 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/oid.hpp>
 #include <cppgit2/ownership.hpp>
-#include <git2.h>
 
 namespace cppgit2 {
 
 class object : public libgit2_api {
-public:
+ public:
   // Default construct a git object
   object();
 
   // Construct from libgit2 C ptr
-  object(git_object *c_ptr, ownership owner_ = ownership::libgit2);
+  object(git_object* c_ptr, ownership owner_ = ownership::libgit2);
 
   // Free git object if owned by user
   ~object();
@@ -54,7 +54,7 @@ public:
   std::string type_string() const;
 
   // Convert a string object type to object_type
-  static object_type type_from_string(const std::string &type_string);
+  static object_type type_from_string(const std::string& type_string);
 
   // Convert an object type to string representation
   static std::string string_from_type(object_type type);
@@ -82,15 +82,15 @@ public:
   class tag as_tag();
 
   // Access libgit2 C ptr
-  const git_object *c_ptr() const { return c_ptr_; }
+  const git_object* c_ptr() const { return c_ptr_; }
 
-private:
+ private:
   friend class reference;
   friend class repository;
   friend class revspec;
   friend class tag;
   ownership owner_;
-  git_object *c_ptr_;
+  git_object* c_ptr_;
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

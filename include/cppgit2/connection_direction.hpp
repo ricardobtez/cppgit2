@@ -8,4 +8,4 @@ namespace cppgit2 {
 // on the remote end when get_refs gets called.
 enum class connection_direction { fetch, push };
 
-} // namespace cppgit2
+}  // namespace cppgit2

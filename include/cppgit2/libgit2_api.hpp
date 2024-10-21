@@ -1,14 +1,14 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/libgit2_api.hpp>
-#include <git2.h>
 #include <iostream>
 #include <tuple>
 
 namespace cppgit2 {
 
 class libgit2_api {
-public:
+ public:
   libgit2_api() { git_libgit2_init(); }
 
   ~libgit2_api() { git_libgit2_shutdown(); }
@@ -21,4 +21,4 @@ public:
   }
 };
 
-} // namespace cppgit2
+}  // namespace cppgit2

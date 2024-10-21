@@ -1,18 +1,18 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/bitmask_operators.hpp>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/index.hpp>
 #include <cppgit2/libgit2_api.hpp>
 #include <cppgit2/strarray.hpp>
 #include <cppgit2/tree.hpp>
-#include <git2.h>
 #include <string>
 #include <vector>
 
 namespace cppgit2 {
 
 class checkout : public libgit2_api {
-public:
+ public:
   enum class checkout_strategy {
     // Default is a dry run, no actual updates
     none = 0,
@@ -115,7 +115,7 @@ public:
   };
 
   class options : public libgit2_api {
-  public:
+   public:
     options() {
       auto ret = git_checkout_init_options(&default_options_,
                                            GIT_CHECKOUT_OPTIONS_VERSION);
@@ -124,7 +124,7 @@ public:
         throw git_exception();
     }
 
-    options(git_checkout_options *c_ptr) : c_ptr_(c_ptr) {}
+    options(git_checkout_options* c_ptr) : c_ptr_(c_ptr) {}
 
     // Version
     unsigned int version() const { return c_ptr_->version; }
@@ -173,7 +173,7 @@ public:
     std::vector<std::string> paths() const {
       return strarray(&c_ptr_->paths).to_vector();
     }
-    void set_paths(const std::vector<std::string> &paths) {
+    void set_paths(const std::vector<std::string>& paths) {
       c_ptr_->paths = *(strarray(paths).c_ptr());
     }
 
@@ -182,16 +182,16 @@ public:
     // working directory does not match this baseline information, that will
     // produce a checkout conflict.
     tree baseline() const { return tree(c_ptr_->baseline); }
-    void set_baseline(const tree &baseline) {
-      c_ptr_->baseline = const_cast<git_tree *>(baseline.c_ptr());
+    void set_baseline(const tree& baseline) {
+      c_ptr_->baseline = const_cast<git_tree*>(baseline.c_ptr());
     }
 
     // Baseline index
     // Like `baseline` above, though expressed as an index. This option
     // overrides `baseline`.
     index baseline_index() const { return index(c_ptr_->baseline_index); }
-    void set_baseline_index(const index &baseline_index) {
-      c_ptr_->baseline_index = const_cast<git_index *>(baseline_index.c_ptr());
+    void set_baseline_index(const index& baseline_index) {
+      c_ptr_->baseline_index = const_cast<git_index*>(baseline_index.c_ptr());
     }
 
     // Target directory
@@ -203,7 +203,7 @@ public:
       else
         return "";
     }
-    void set_target_directory(const std::string &target_directory) {
+    void set_target_directory(const std::string& target_directory) {
       c_ptr_->target_directory = target_directory.c_str();
     }
 
@@ -216,7 +216,7 @@ public:
       else
         return "";
     }
-    void set_ancestor_label(const std::string &ancestor_label) {
+    void set_ancestor_label(const std::string& ancestor_label) {
       c_ptr_->ancestor_label = ancestor_label.c_str();
     }
 
@@ -229,7 +229,7 @@ public:
       else
         return "";
     }
-    void set_our_label(const std::string &our_label) {
+    void set_our_label(const std::string& our_label) {
       c_ptr_->our_label = our_label.c_str();
     }
 
@@ -242,18 +242,18 @@ public:
       else
         return "";
     }
-    void set_their_label(const std::string &their_label) {
+    void set_their_label(const std::string& their_label) {
       c_ptr_->their_label = their_label.c_str();
     }
 
-    const git_checkout_options *c_ptr() const { return c_ptr_; }
+    const git_checkout_options* c_ptr() const { return c_ptr_; }
 
-  private:
-    git_checkout_options *c_ptr_;
+   private:
+    git_checkout_options* c_ptr_;
     git_checkout_options default_options_;
   };
 };
 ENABLE_BITMASK_OPERATORS(checkout::notification_flag);
 ENABLE_BITMASK_OPERATORS(checkout::checkout_strategy);
 
-} // namespace cppgit2
+}  // namespace cppgit2

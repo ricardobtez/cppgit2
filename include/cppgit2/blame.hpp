@@ -1,21 +1,21 @@
 #pragma once
+#include <git2.h>
 #include <cppgit2/bitmask_operators.hpp>
 #include <cppgit2/git_exception.hpp>
 #include <cppgit2/oid.hpp>
 #include <cppgit2/ownership.hpp>
 #include <cppgit2/signature.hpp>
-#include <git2.h>
 
 namespace cppgit2 {
 
 class blame : public libgit2_api {
-public:
+ public:
   // Default construct a blame object
   blame();
 
   // Construct from libgit2 C ptr
   // If owned by user, will be free'd in the destructor
-  blame(git_blame *c_ptr, ownership owner = ownership::libgit2);
+  blame(git_blame* c_ptr, ownership owner = ownership::libgit2);
 
   // Free blame object if owned by user
   ~blame();
@@ -24,11 +24,11 @@ public:
   // parameter is a pre-calculated blame for the in-odb history of the file.
   // This means that once a file blame is completed (which can be expensive),
   // updating the buffer blame is very fast.
-  static blame get_blame_for_buffer(const blame &reference,
-                                    const std::string &buffer);
+  static blame get_blame_for_buffer(const blame& reference,
+                                    const std::string& buffer);
 
   class options : public libgit2_api {
-  public:
+   public:
     options() : c_ptr_(nullptr) {
       auto ret =
           git_blame_init_options(&default_options_, GIT_BLAME_OPTIONS_VERSION);
@@ -37,7 +37,7 @@ public:
         throw git_exception();
     }
 
-    options(git_blame_options *c_ptr) : c_ptr_(c_ptr) {}
+    options(git_blame_options* c_ptr) : c_ptr_(c_ptr) {}
 
     enum class flag {
       normal = 0,
@@ -96,7 +96,7 @@ public:
     // Newest commit
     // The id of the newest commit to consider. The default is HEAD.
     oid newest_commit() const { return oid(&c_ptr_->newest_commit); }
-    void set_newest_commit(const oid &id) {
+    void set_newest_commit(const oid& id) {
       git_oid_fromstr(&c_ptr_->newest_commit, id.to_hex_string().c_str());
     }
 
@@ -104,7 +104,7 @@ public:
     // The id of the oldest commit to consider. The default is the first commit
     // encountered with a NULL parent.
     oid oldest_commit() const { return oid(&c_ptr_->oldest_commit); }
-    void set_oldest_commit(const oid &id) {
+    void set_oldest_commit(const oid& id) {
       git_oid_fromstr(&c_ptr_->oldest_commit, id.to_hex_string().c_str());
     }
 
@@ -120,18 +120,18 @@ public:
     size_t max_line() const { return c_ptr_->max_line; }
     void set_max_line(size_t max_line) { c_ptr_->max_line = max_line; }
 
-    const git_blame_options *c_ptr() const { return c_ptr_; }
+    const git_blame_options* c_ptr() const { return c_ptr_; }
 
-  private:
+   private:
     friend class repository;
-    git_blame_options *c_ptr_;
+    git_blame_options* c_ptr_;
     git_blame_options default_options_;
   };
 
   // Always owned by libgit2
   class hunk : public libgit2_api {
-  public:
-    hunk(const git_blame_hunk *c_ptr) : c_ptr_(c_ptr) {}
+   public:
+    hunk(const git_blame_hunk* c_ptr) : c_ptr_(c_ptr) {}
 
     // Number of lines in hunk
     size_t lines_in_hunk() const { return c_ptr_->lines_in_hunk; }
@@ -176,8 +176,8 @@ public:
     // 1 iff the hunk has been tracked to a boundary commit
     char boundary() const { return c_ptr_->boundary; }
 
-  private:
-    const git_blame_hunk *c_ptr_;
+   private:
+    const git_blame_hunk* c_ptr_;
   };
 
   // Gets the blame hunk at the given index.
@@ -191,13 +191,13 @@ public:
   size_t hunk_count() const;
 
   // Access libgit2 C ptr
-  const git_blame *c_ptr() const;
+  const git_blame* c_ptr() const;
 
-private:
+ private:
   friend class repository;
-  git_blame *c_ptr_;
+  git_blame* c_ptr_;
   ownership owner_;
 };
 ENABLE_BITMASK_OPERATORS(blame::options::flag);
 
-} // namespace cppgit2
+}  // namespace cppgit2
