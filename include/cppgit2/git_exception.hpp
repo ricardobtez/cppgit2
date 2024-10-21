@@ -16,7 +16,7 @@ class git_exception : public std::exception {
   virtual ~git_exception() throw() {}
   virtual const char* what() const throw() { return message_; }
 
-  static void clear() { git_error_clear(); }
+  static void clear() { giterr_clear(); }
 
  protected:
   const char* message_;
