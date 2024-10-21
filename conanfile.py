@@ -71,5 +71,5 @@ class Cppgit2Conan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["cppgit2"]
-        self.cpp.info.libdirs = ["lib"]
+        self.cpp_info.libdirs = ["lib"]
         self.cpp_info.includedirs = ["include"]
