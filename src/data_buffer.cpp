@@ -6,28 +6,28 @@ namespace cppgit2 {
  * assume ptr is non-NULL and zero terminated even for new git_bufs.
  */
 char git_buf__initbuf[1];
-/* Use to initialize buffer structure when git_buf is on stack */
-#define GIT_BUF_INIT \
-  { git_buf__initbuf, 0, 0 }
 
 data_buffer::data_buffer() {
   c_struct_ = GIT_BUF_INIT;
 }
 
 data_buffer::data_buffer(size_t n) {
-  c_struct_.ptr = (char*)malloc(n * sizeof(char));
-  if (c_struct_.ptr)
-    memset(c_struct_.ptr, '\0', n * sizeof(char));
-  c_struct_.asize = n;
-  c_struct_.size = 0;
+  c_struct_.ptr = (char*)malloc((n * sizeof(char)) + 1);
+  if (c_struct_.ptr) {
+    memset(c_struct_.ptr, '\0', (n * sizeof(char)) + 1);
+  }
+  c_struct_.reserved = 0;
+  c_struct_.size = n;
 }
 
 data_buffer::data_buffer(const git_buf* c_ptr) {
-  c_struct_.ptr = (char*)malloc(c_ptr->asize * sizeof(char));
-  c_struct_.asize = c_ptr->asize;
+  c_struct_.ptr = (char*)malloc((c_ptr->size * sizeof(char)) + 1);
+  memset(c_struct_.ptr, '\0', (c_ptr->size * sizeof(char)) + 1);
+  c_struct_.reserved = c_ptr->reserved;
   c_struct_.size = c_ptr->size;
-  if (c_struct_.ptr)
-    strncpy(c_struct_.ptr, c_ptr->ptr, c_ptr->asize);
+  if (c_struct_.ptr) {
+    strncpy(c_struct_.ptr, c_ptr->ptr, c_ptr->size);
+  }
 }
 
 data_buffer::~data_buffer() {

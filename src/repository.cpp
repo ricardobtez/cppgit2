@@ -777,9 +777,9 @@ oid repository::create_commit(const std::string& update_ref,
   const char* update_ref_c = (update_ref == "") ? NULL : update_ref.c_str();
   const char* message_encoding_c =
       message_encoding == "" ? NULL : message_encoding.c_str();
-  std::vector<const git_commit*> parents_c;
+  std::vector<git_commit*> parents_c;
   for (auto& p : parents) {
-    parents_c.push_back(p.c_ptr());
+    parents_c.push_back(const_cast<git_commit*>(p.c_ptr()));
   }
   if (git_commit_create(result.c_ptr(), c_ptr_, update_ref_c, author.c_ptr(),
                         committer.c_ptr(), message_encoding_c, message.c_str(),
@@ -795,9 +795,9 @@ data_buffer repository::create_commit(
   data_buffer result;
   const char* message_encoding_c =
       message_encoding == "" ? NULL : message_encoding.c_str();
-  std::vector<const git_commit*> parents_c;
+  std::vector<git_commit*> parents_c;
   for (auto& p : parents) {
-    parents_c.push_back(p.c_ptr());
+    parents_c.push_back(const_cast<git_commit*>(p.c_ptr()));
   }
   if (git_commit_create_buffer(result.c_ptr(), c_ptr_, author.c_ptr(),
                                committer.c_ptr(), message_encoding_c,
