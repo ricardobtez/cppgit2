@@ -12,19 +12,22 @@ data_buffer::data_buffer() {
 }
 
 data_buffer::data_buffer(size_t n) {
-  c_struct_.ptr = (char*)malloc(n * sizeof(char));
-  if (c_struct_.ptr)
-    memset(c_struct_.ptr, '\0', n * sizeof(char));
-  c_struct_.reserved = n;
-  c_struct_.size = 0;
+  c_struct_.ptr = (char*)malloc((n * sizeof(char)) + 1);
+  if (c_struct_.ptr) {
+    memset(c_struct_.ptr, '\0', (n * sizeof(char)) + 1);
+  }
+  c_struct_.reserved = 0;
+  c_struct_.size = n;
 }
 
 data_buffer::data_buffer(const git_buf* c_ptr) {
-  c_struct_.ptr = (char*)malloc(c_ptr->reserved * sizeof(char));
+  c_struct_.ptr = (char*)malloc((c_ptr->size * sizeof(char)) + 1);
+  memset(c_struct_.ptr, '\0', (c_ptr->size * sizeof(char)) + 1);
   c_struct_.reserved = c_ptr->reserved;
   c_struct_.size = c_ptr->size;
-  if (c_struct_.ptr)
+  if (c_struct_.ptr) {
     strncpy(c_struct_.ptr, c_ptr->ptr, c_ptr->size);
+  }
 }
 
 data_buffer::~data_buffer() {
