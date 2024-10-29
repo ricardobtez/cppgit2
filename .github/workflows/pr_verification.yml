@@ -71,7 +71,7 @@ jobs:
         run: |
           conan upload openssl -r conan_remote
           conan upload zlib -r conan_remote
-          conan upload libssh -r conan_remote
+          conan upload libssh2 -r conan_remote
 
       - name: Configure CMake
         run: |
