@@ -40,7 +40,7 @@ class Cppgit2Conan(ConanFile):
     generators = "CMakeDeps"
 
     def requirements(self):
-        self.requires("libgit2/1.8.1")
+        self.requires("libgit2/[>=1.8.1]")
 
     def build_requirements(self):
         self.tool_requires("cmake/[>=3.19]")
