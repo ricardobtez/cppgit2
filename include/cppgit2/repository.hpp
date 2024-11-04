@@ -712,7 +712,7 @@ class repository : public libgit2_api {
 
   // Run operation for each commit in the repository
   void for_each_commit(
-      std::function<void(const commit& id)> visitor,
+      std::function<bool(const commit& id)> visitor,
       revision::sort sort_ordering = revision::sort::none) const;
 
   // Run operation for each commit in the repository

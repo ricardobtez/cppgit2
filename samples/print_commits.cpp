@@ -10,6 +10,7 @@ int main(int argc, char** argv) {
       std::cout << c.id().to_hex_string(8) << " [" << c.committer().name()
                 << "]"
                 << " " << c.summary() << std::endl;
+      return true;
     });
 
   } else {
