@@ -844,7 +844,7 @@ commit repository::lookup_commit(const oid& id, size_t length) const {
   return result;
 }
 
-void repository::for_each_commit(std::function<void(const commit& id)> visitor,
+void repository::for_each_commit(std::function<bool(const commit& id)> visitor,
                                  revision::sort sort_ordering) const {
   git_revwalk* iter;
   auto ret = git_revwalk_new(&iter, c_ptr_);
@@ -857,9 +857,10 @@ void repository::for_each_commit(std::function<void(const commit& id)> visitor,
 
   git_revwalk_sorting(iter, static_cast<unsigned int>(sort_ordering));
   git_oid id_c;
-  while ((ret = git_revwalk_next(&id_c, iter)) == 0) {
+  bool continue_iterating = true;
+  while ((ret = git_revwalk_next(&id_c, iter)) == 0 && continue_iterating) {
     oid id(&id_c);
-    visitor(lookup_commit(id));
+    continue_iterating = visitor(lookup_commit(id));
   }
   git_revwalk_free(iter);
 }
